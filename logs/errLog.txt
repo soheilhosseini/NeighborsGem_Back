@@ -1,0 +1,12 @@
+20250309	12:34:34	b64a0043-812a-4d23-bcc2-b50ab545836b	Error: Not allowed by CORS
+20250309	17:57:58	8288f09c-92c3-427d-9ce2-95c36bac247a	TypeError: req.json is not a function
+20250309	17:58:54	9f52f9c6-ff0c-4d68-856a-f643a421a95b	TypeError: req.json is not a function
+20250309	17:59:49	32b4acf9-5b18-4f48-81bc-d2909325c93a	SyntaxError: Expected property name or '}' in JSON at position 4
+20250310	12:57:25	34d18546-35d9-43aa-800a-0234b2119d1f	TypeError: Cannot read properties of undefined (reading 'jwt')
+20250310	12:57:41	c4fb9518-828c-44c9-a410-3687a9a3983c	TypeError: Cannot read properties of undefined (reading 'jwt')
+20250310	12:58:16	7930ee02-1cd5-4ad9-9e24-2998fb37f619	TypeError: Cannot read properties of undefined (reading 'jwt')
+20250310	12:59:33	72075712-09ef-462b-8a2e-114e490dd7b1	TypeError: Cannot read properties of undefined (reading 'jwt')
+20250310	13:02:20	2aa76bc5-87dc-4d25-890f-10c9521fdbcb	TypeError: Cannot read properties of undefined (reading 'jwt')
+20250310	13:02:21	cff9f334-970d-441b-80a3-331ee9b63743	TypeError: Cannot read properties of undefined (reading 'jwt')
+20250310	13:04:12	1ff6a167-2847-4e8d-90e8-13ad8493c46a	TypeError: Cannot read properties of undefined (reading 'jwt')
+20250310	13:06:22	df48336e-ba47-40b8-bef7-010f2905288a	TypeError: Cannot read properties of undefined (reading 'jwt')
