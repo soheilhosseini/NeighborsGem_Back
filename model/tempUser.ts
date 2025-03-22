@@ -1,11 +1,13 @@
 import mongoose from "mongoose";
 
 const TempUserSchema = new mongoose.Schema({
-  email: { type: String, unique: true },
-  phone_number: { type: String, unique: true },
+  email: { type: String, trim: true, sparse: true },
+  phone_number: { type: String, trim: true, sparse: true },
+  username: { type: String, trim: true, sparse: true },
   address: { type: String },
-  username: { type: String, unique: true },
-  createAt: { type: Date, default: Date.now, expires: 300 },
+  createAt: { type: Date, default: Date.now, expires: 30000 },
+  otp: { type: String, default: "123" },
+  successfulOpt: { type: Boolean, default: false },
 });
 
-export default mongoose.model("TempUser", TempUserSchema);
+export default mongoose.model("TempUsers", TempUserSchema);

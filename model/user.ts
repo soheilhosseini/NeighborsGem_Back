@@ -1,11 +1,15 @@
 import mongoose from "mongoose";
+import refreshTokenSchema from "./refreshToken";
 
 const UserSchema = new mongoose.Schema({
-  email: { type: String, unique: true },
-  phone_number: { type: String, unique: true },
+  first_name: { type: String },
+  last_name: { type: String },
+  email: { type: String, trim: true, sparse: true },
+  phone_number: { type: String, trim: true, sparse: true },
+  username: { type: String, trim: true, sparse: true },
   address: { type: String },
-  username: { type: String, unique: true },
   createAt: { type: Date, default: Date.now },
+  refresh_tokens: [refreshTokenSchema],
 });
 
-export default mongoose.model("User", UserSchema);
+export default mongoose.model("Users", UserSchema);

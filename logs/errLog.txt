@@ -10,3 +10,7 @@
 20250310	13:02:21	cff9f334-970d-441b-80a3-331ee9b63743	TypeError: Cannot read properties of undefined (reading 'jwt')
 20250310	13:04:12	1ff6a167-2847-4e8d-90e8-13ad8493c46a	TypeError: Cannot read properties of undefined (reading 'jwt')
 20250310	13:06:22	df48336e-ba47-40b8-bef7-010f2905288a	TypeError: Cannot read properties of undefined (reading 'jwt')
+20250317	00:20:03	7fdc0870-8b12-4768-b6be-05028107ca4f	SyntaxError: Bad control character in string literal in JSON at position 49
+20250317	00:35:02	1e5af92f-37ba-4fd3-b639-c1bd6b99abea	Error: Not allowed by CORS
+20250317	00:35:07	22aedbba-4a78-4f3a-ad2c-4221ac56d626	Error: Not allowed by CORS
+20250317	00:36:21	b7177ece-d994-46c7-b8a0-94adbea901bf	Error: Not allowed by CORS

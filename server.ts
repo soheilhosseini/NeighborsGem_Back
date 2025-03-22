@@ -8,10 +8,14 @@ import corsOptions from "./config/corsOptions";
 import credentials from "./middleware/credentials";
 import log from "./middleware/log";
 import connectDB from "./database/db";
-import authRoutes from "./routes/api/auth/auth";
+import apis from "./routes/api/api";
 const PORT = process.env.PORT || 3500;
 
 const app = express();
+
+//middleware for cookies
+app.use(cookieParser());
+
 // custom middleware logger
 app.use(log);
 
@@ -22,18 +26,15 @@ app.use(urlencoded({ extended: false }));
 
 app.use(json());
 
-//middleware for cookies
-app.use(cookieParser());
-
 app.use(express.static(join(__dirname, "/public")));
 
 connectDB();
 
-app.use("/auth", authRoutes);
+app.use("/api", apis);
 // app.use("/auth", require("./routes/auth"));
 // app.use("/refresh", require("./routes/refresh"));
 // app.use("/logout", require("./routes/logout"));
-// // app.use(verifyJWT);
+// app.use(verifyJWT);
 // app.use("/me", require("./routes/api/me"));
 
 app.all("*", (_, res) => {
