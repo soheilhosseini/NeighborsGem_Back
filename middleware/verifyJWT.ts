@@ -3,23 +3,26 @@ import messagesConstant from "../constants/messages";
 import jwt from "jsonwebtoken";
 require("dotenv").config();
 
-const verifyJWT = (req: Request, res: Response, next: NextFunction) => {
+const verifyJWT = (req: Request, res: Response, next: NextFunction): void => {
   const access_token = req.cookies.access_token;
 
-  if (!access_token)
-    return res.status(401).json({ message: messagesConstant.en.invalidToken });
+  if (!access_token) {
+    res.status(401).json({ message: messagesConstant.en.invalidToken });
+    return;
+  }
 
   if (process.env.ACCESS_TOKEN_SECRET) {
     jwt.verify(
       access_token,
       process.env.ACCESS_TOKEN_SECRET,
-      (err: jwt.VerifyErrors | null, user: any) => {
-        if (err)
-          return res
-            .status(401)
-            .json({ message: messagesConstant.en.invalidToken });
+      (err: jwt.VerifyErrors | null, decoded: any) => {
+        if (err) {
+          res.status(401).json({ message: messagesConstant.en.invalidToken });
+          return;
+        }
+
         // @ts-ignore
-        req.user = user;
+        req.body = { ...req.body, main_id: decoded._id };
         next();
       }
     );

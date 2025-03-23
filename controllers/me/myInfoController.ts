@@ -1,11 +1,13 @@
 import { Request, Response } from "express";
 import UserModel from "../../model/user";
+import AddressModel from "../../model/address";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import messagesConstant from "../../constants/messages";
 
 dotenv.config();
 
-const myInfoController = async (req: Request, res: Response) => {
+const getMyInfoController = async (req: Request, res: Response) => {
   const cookies = req.cookies;
   if (!cookies?.access_token) {
     res.sendStatus(401);
@@ -20,15 +22,9 @@ const myInfoController = async (req: Request, res: Response) => {
           res.sendStatus(401);
           return;
         }
-        console.log(decoded, "dasfasdff");
         const user = await UserModel.findOne({
-          $or: [
-            { phone_number: decoded.user_identity },
-            { email: decoded.user_identity },
-          ],
+          _id: decoded._id,
         }).select("-refresh_tokens");
-        console.log(user, "dasfasdff");
-
         res.json({ message: "", data: { user } });
       }
     );
@@ -37,4 +33,139 @@ const myInfoController = async (req: Request, res: Response) => {
   }
 };
 
-export { myInfoController };
+const updateMyInfoController = async (req: Request, res: Response) => {
+  const { main_id, first_name, last_name, username } = req.body;
+  if ((!first_name || !last_name) && !username) {
+    res.status(400).json({ message: messagesConstant.en.emptyRequiredFileds });
+    return;
+  }
+  const updateFileds: any = {};
+  if (first_name && last_name) {
+    updateFileds.first_name = first_name;
+    updateFileds.last_name = last_name;
+  }
+  if (username) {
+    updateFileds.username = username;
+    const foundUser = await UserModel.findOne({
+      username,
+      _id: { $not: { $eq: main_id } },
+    });
+    if (foundUser) {
+      res.status(409).json({ message: messagesConstant.en.existUsername });
+      return;
+    }
+  }
+  try {
+    await UserModel.findByIdAndUpdate(
+      main_id,
+      { $set: updateFileds },
+      { new: true }
+    );
+    res.status(200).json({ message: messagesConstant.en.userInfoUpdated });
+  } catch (err) {
+    res.sendStatus(500);
+  }
+};
+
+const addNewAddressController = async (req: Request, res: Response) => {
+  const { _id, address, is_main_address, cordinates } = req.body;
+
+  if (!_id || !address || !cordinates) {
+    res.sendStatus(400);
+  }
+  try {
+    await AddressModel.insertOne({ address, is_main_address, cordinates });
+    res.sendStatus(201);
+  } catch (err) {
+    res.sendStatus(500);
+  }
+};
+
+const sendUpdateEmailOTPController = async (req: Request, res: Response) => {
+  const { email, main_id } = req.body;
+
+  const isDuplicated = await UserModel.findOne({
+    email,
+    _id: { $not: { $eq: main_id } },
+  });
+
+  if (isDuplicated) {
+    res.status(409).json({ message: messagesConstant.en.emailIsNotAvailable });
+    return;
+  }
+  res.json({ message: messagesConstant.en.optSent });
+};
+
+const verifyUpdateEmailOTPController = async (req: Request, res: Response) => {
+  const { email, otp, main_id } = req.body;
+
+  if (!email || !otp) {
+    res.sendStatus(400);
+  }
+
+  if (otp === "123") {
+    try {
+      await UserModel.updateOne({ _id: main_id }, { $set: { email } });
+      res.json({ message: messagesConstant.en.emailUpdatedSuccessfuly });
+    } catch (err) {
+      res.sendStatus(500);
+    }
+  } else {
+    res.status(400).json({ message: messagesConstant.en.wrongEmailUpdateOTP });
+  }
+};
+
+const sendUpdatePhoneNumberOTPController = async (
+  req: Request,
+  res: Response
+) => {
+  const { phone_number, main_id } = req.body;
+
+  const isDuplicated = await UserModel.findOne({
+    phone_number,
+    _id: { $not: { $eq: main_id } },
+  });
+
+  if (isDuplicated) {
+    res
+      .status(409)
+      .json({ message: messagesConstant.en.phoneNumberIsNotAvailable });
+    return;
+  }
+
+  res.json({ message: messagesConstant.en.optSent });
+};
+
+const verifyUpdatePhoneNumberOTPController = async (
+  req: Request,
+  res: Response
+) => {
+  const { phone_number, otp, main_id } = req.body;
+
+  if (!phone_number || !otp) {
+    res.sendStatus(400);
+  }
+
+  if (otp === "123") {
+    try {
+      await UserModel.updateOne({ _id: main_id }, { $set: { phone_number } });
+      res.json({ message: messagesConstant.en.phoneNumberUpdatedSuccessfuly });
+    } catch (err) {
+      res.sendStatus(500);
+    }
+  } else {
+    res
+      .status(400)
+      .json({ message: messagesConstant.en.wrongPhoneNumberUpdateOTP });
+  }
+};
+
+export {
+  getMyInfoController,
+  updateMyInfoController,
+  addNewAddressController,
+  sendUpdateEmailOTPController,
+  verifyUpdateEmailOTPController,
+  sendUpdatePhoneNumberOTPController,
+  verifyUpdatePhoneNumberOTPController,
+};

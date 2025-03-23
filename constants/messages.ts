@@ -16,6 +16,14 @@ const messages = {
       "Weak password. Use at least 8 characters with uppercase, lowercase, numbers, and special symbols.",
     completeRegistration: "Welcome!",
     invalidToken: "Invalid Token",
+    userInfoUpdated: "Updated Successfuly",
+    emptyRequiredFileds: "Required Fileds Are Empty",
+    emailUpdatedSuccessfuly: "Email Has Been Updated Successfuly",
+    phoneNumberUpdatedSuccessfuly: "Phone Number Has Been Updated Successfuly",
+    wrongEmailUpdateOTP: "OTP Is Wrong",
+    wrongPhoneNumberUpdateOTP: "OTP Is Wrong",
+    emailIsNotAvailable: "Email Address Is Not Available",
+    phoneNumberIsNotAvailable: "Phone Number Is Not Available",
   },
 };
 

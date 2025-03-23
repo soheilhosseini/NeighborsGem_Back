@@ -179,10 +179,11 @@ const handleSetPassword = async (req: Request, res: Response) => {
       password: hashedPassword,
       // refresh_tokens: [newRefreshToken],
     };
-    await UserModel.insertOne(payload);
+    const newUser = await UserModel.insertOne(payload);
+    console.log(newUser, "asdfasdfasdf");
     await TempUserModel.deleteOne({ _id: foundedTempUser._id });
     if (process.env.ACCESS_TOKEN_SECRET) {
-      const access_token = generateAccessToken(user_identity);
+      const access_token = generateAccessToken(newUser._id.toString());
       if (access_token) {
         res.cookie("access_token", access_token, {
           path: "/",
