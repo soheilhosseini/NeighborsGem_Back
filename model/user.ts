@@ -9,6 +9,7 @@ const UserSchema = new mongoose.Schema({
   username: { type: String, trim: true, sparse: true },
   address: { type: String },
   createAt: { type: Date, default: Date.now },
+  password: { type: String, trim: true },
   refresh_tokens: [refreshTokenSchema],
 });
 

@@ -24,6 +24,9 @@ const messages = {
     wrongPhoneNumberUpdateOTP: "OTP Is Wrong",
     emailIsNotAvailable: "Email Address Is Not Available",
     phoneNumberIsNotAvailable: "Phone Number Is Not Available",
+    loginUserIdentityIsEmpty: "Email, Phone Number or User Name is require",
+    loginUserNotFound: "User Not Found",
+    loginWithPasswordWrongInputs: "Inputs Are Invalid",
   },
 };
 
