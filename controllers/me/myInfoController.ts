@@ -67,20 +67,6 @@ const updateMyInfoController = async (req: Request, res: Response) => {
   }
 };
 
-const addNewAddressController = async (req: Request, res: Response) => {
-  const { _id, address, is_main_address, cordinates } = req.body;
-
-  if (!_id || !address || !cordinates) {
-    res.sendStatus(400);
-  }
-  try {
-    await AddressModel.insertOne({ address, is_main_address, cordinates });
-    res.sendStatus(201);
-  } catch (err) {
-    res.sendStatus(500);
-  }
-};
-
 const sendUpdateEmailOTPController = async (req: Request, res: Response) => {
   const { email, main_id } = req.body;
 
@@ -160,12 +146,85 @@ const verifyUpdatePhoneNumberOTPController = async (
   }
 };
 
+const addNewAddressController = async (req: Request, res: Response) => {
+  const { main_id, address, coordinates } = req.body;
+
+  if (!address || !coordinates) {
+    res.sendStatus(400);
+  }
+  try {
+    await AddressModel.insertOne({
+      address,
+      coordinates,
+      user_id: main_id,
+    });
+    res
+      .status(201)
+      .json({ message: messagesConstant.en.addressCreatedSuccessfuly });
+  } catch (err) {
+    res.sendStatus(500);
+  }
+};
+
+const getMyAddressesController = async (req: Request, res: Response) => {
+  const { main_id } = req.body;
+  console.log(main_id);
+  try {
+    const addresses =
+      (await AddressModel.find({ user_id: { $eq: main_id } })) || [];
+    res.json({ message: "", data: { addresses } });
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+};
+
+const setDefaultAddressController = async (req: Request, res: Response) => {
+  const { main_id, _id } = req.body;
+  if (!_id) {
+    res.sendStatus(400);
+    return;
+  }
+  try {
+    await AddressModel.updateMany(
+      { is_main_address: true, user_id: main_id },
+      { $set: { is_main_address: false } }
+    );
+    await AddressModel.updateOne({ _id }, { $set: { is_main_address: true } });
+    res.json({ message: messagesConstant.en.defaultAddressWasSet });
+    return;
+  } catch (err) {
+    res.sendStatus(500);
+  }
+};
+
+const deleteAddressController = async (req: Request, res: Response) => {
+  const { main_id, _id } = req.body;
+
+  if (!_id) {
+    res.sendStatus(400);
+    return;
+  }
+  try {
+    await AddressModel.deleteOne({ user_id: main_id, _id });
+    res
+      .status(204)
+      .json({ message: messagesConstant.en.AddressDeletedSuccessfuly });
+    return;
+  } catch (err) {
+    res.sendStatus(500);
+  }
+};
+
 export {
   getMyInfoController,
   updateMyInfoController,
-  addNewAddressController,
   sendUpdateEmailOTPController,
   verifyUpdateEmailOTPController,
   sendUpdatePhoneNumberOTPController,
   verifyUpdatePhoneNumberOTPController,
+  addNewAddressController,
+  getMyAddressesController,
+  setDefaultAddressController,
+  deleteAddressController,
 };

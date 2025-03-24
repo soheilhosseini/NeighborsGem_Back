@@ -27,6 +27,9 @@ const messages = {
     loginUserIdentityIsEmpty: "Email, Phone Number or User Name is require",
     loginUserNotFound: "User Not Found",
     loginWithPasswordWrongInputs: "Inputs Are Invalid",
+    addressCreatedSuccessfuly: "Address was Created Successfuly",
+    defaultAddressWasSet: "Default Address Was Set",
+    AddressDeletedSuccessfuly: "Address Was Deleted Successfuly",
   },
 };
 
