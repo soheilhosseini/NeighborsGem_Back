@@ -126,8 +126,21 @@ const loginWithOTPCheckOTPController = async (req: Request, res: Response) => {
   }
 };
 
+const logoutController = (req: Request, res: Response) => {
+  const { main_id } = req.body;
+
+  res.clearCookie("access_token", {
+    path: "/",
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  });
+  res.status(204).json({ message: messagesConstant.en.logout });
+};
+
 export {
   loginWithPasswordController,
   loginWithOTPGetUserIdentityController,
   loginWithOTPCheckOTPController,
+  logoutController,
 };

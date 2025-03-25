@@ -14,3 +14,10 @@
 20250317	00:35:02	1e5af92f-37ba-4fd3-b639-c1bd6b99abea	Error: Not allowed by CORS
 20250317	00:35:07	22aedbba-4a78-4f3a-ad2c-4221ac56d626	Error: Not allowed by CORS
 20250317	00:36:21	b7177ece-d994-46c7-b8a0-94adbea901bf	Error: Not allowed by CORS
+20250326	00:21:07	e2b691c2-a5a2-4551-9944-5a58948e3fc7	MulterError: Unexpected field
+20250326	00:23:11	b512e0f3-b6f7-4508-9b4e-037b53de99dc	MulterError: Unexpected field
+20250326	00:25:02	21d34b66-64e3-4539-a463-3ea9a0b9e00e	MulterError: Unexpected field
+20250326	00:25:27	aad03626-9eb5-497d-a415-9bf81345652d	MulterError: Unexpected field
+20250326	00:25:43	95e4bb3f-78d4-4fa0-a58e-ed8b99a60913	MulterError: Unexpected field
+20250326	00:27:14	37f2c372-d117-4904-97c4-7629c074797c	MulterError: Unexpected field
+20250326	00:34:14	755ff163-0dda-4982-8a8c-641ddb26714e	Error: ENOENT: no such file or directory, open 'D:\Programming\uploads\1742936654522-photo_2018-12-03_00-45-06.jpg'

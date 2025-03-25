@@ -7,7 +7,7 @@ const verifyJWT = (req: Request, res: Response, next: NextFunction): void => {
   const access_token = req.cookies.access_token;
 
   if (!access_token) {
-    res.status(401).json({ message: messagesConstant.en.invalidToken });
+    res.sendStatus(401);
     return;
   }
 

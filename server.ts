@@ -31,6 +31,7 @@ app.use(express.static(join(__dirname, "/public")));
 connectDB();
 
 app.use("/api", apis);
+app.use("/uploads", express.static("uploads"));
 // app.use("/auth", require("./routes/auth"));
 // app.use("/refresh", require("./routes/refresh"));
 // app.use("/logout", require("./routes/logout"));

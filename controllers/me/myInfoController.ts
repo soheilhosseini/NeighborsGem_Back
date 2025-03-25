@@ -153,10 +153,15 @@ const addNewAddressController = async (req: Request, res: Response) => {
     res.sendStatus(400);
   }
   try {
+    await AddressModel.updateMany(
+      { is_main_address: true, user_id: main_id },
+      { $set: { is_main_address: false } }
+    );
     await AddressModel.insertOne({
       address,
       coordinates,
       user_id: main_id,
+      is_main_address: true,
     });
     res
       .status(201)
@@ -170,8 +175,7 @@ const getMyAddressesController = async (req: Request, res: Response) => {
   const { main_id } = req.body;
   console.log(main_id);
   try {
-    const addresses =
-      (await AddressModel.find({ user_id: { $eq: main_id } })) || [];
+    const addresses = (await AddressModel.find({ user_id: main_id })) || [];
     res.json({ message: "", data: { addresses } });
   } catch (err) {
     console.log(err);

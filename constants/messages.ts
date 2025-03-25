@@ -30,6 +30,8 @@ const messages = {
     addressCreatedSuccessfuly: "Address was Created Successfuly",
     defaultAddressWasSet: "Default Address Was Set",
     AddressDeletedSuccessfuly: "Address Was Deleted Successfuly",
+    logout: "See You Soon",
+    postHasBeenCreated: "The Post Has Been Created",
   },
 };
 
