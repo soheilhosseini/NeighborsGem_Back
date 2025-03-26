@@ -11,7 +11,9 @@ import {
   getMyAddressesController,
   setDefaultAddressController,
   deleteAddressController,
+  setAvatarController,
 } from "../../../controllers/me/myInfoController";
+import upload from "../../../utils/multer"; // adjust path
 
 router.get("/my-info", getMyInfoController);
 router.put("/my-info", updateMyInfoController);
@@ -31,6 +33,11 @@ router.post(
 router.post(
   "/my-info/verify-update-phone-number-otp",
   verifyUpdatePhoneNumberOTPController
+);
+router.post(
+  "/my-info/set-avatar",
+  upload.array("media", 1),
+  setAvatarController
 );
 
 export default router;

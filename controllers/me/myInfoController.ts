@@ -220,6 +220,30 @@ const deleteAddressController = async (req: Request, res: Response) => {
   }
 };
 
+const setAvatarController = async (req: Request, res: Response) => {
+  const { main_id, avatar } = req.body;
+
+  if (!avatar) {
+    res.sendStatus(400);
+    return;
+  }
+
+  const files = req.files as Express.Multer.File[];
+
+  if (!files || files.length === 0) {
+    res.status(400).json({ error: "No files uploaded" });
+    return;
+  }
+
+  try {
+    await UserModel.updateOne({
+      _id: main_id
+    }, {$set:{avatar: }});
+  } catch (err) {
+    res.sendStatus(500);
+  }
+};
+
 export {
   getMyInfoController,
   updateMyInfoController,
@@ -231,4 +255,5 @@ export {
   getMyAddressesController,
   setDefaultAddressController,
   deleteAddressController,
+  setAvatarController,
 };

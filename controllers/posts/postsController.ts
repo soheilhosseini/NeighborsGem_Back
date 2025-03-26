@@ -46,7 +46,7 @@ const getPostsController = async (req: Request, res: Response) => {
     .populate("created_by", "phone_number username _id")
     .populate("address_id", "address coordinates");
   console.log(main_id, posts);
-  res.json({ message: "", data: { posts, count } });
+  res.json({ message: "", data: { list: posts, count } });
 };
 
 export { addNewPostController, getPostsController };

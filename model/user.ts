@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import refreshTokenSchema from "./refreshToken";
+import AvatarSchema from "./avatar";
 
 const UserSchema = new mongoose.Schema({
   first_name: { type: String },
@@ -10,7 +10,7 @@ const UserSchema = new mongoose.Schema({
   address: { type: String },
   createAt: { type: Date, default: Date.now },
   password: { type: String, trim: true },
-  refresh_tokens: [refreshTokenSchema],
+  avatar: AvatarSchema,
 });
 
 export default mongoose.model("User", UserSchema);
