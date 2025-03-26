@@ -13,7 +13,8 @@ import {
   deleteAddressController,
   setAvatarController,
 } from "../../../controllers/me/myInfoController";
-import upload from "../../../utils/multer"; // adjust path
+import { upload, storage } from "../../../utils/multer"; // adjust path
+import verifyJWT from "../../../middleware/verifyJWT";
 
 router.get("/my-info", getMyInfoController);
 router.put("/my-info", updateMyInfoController);
@@ -36,7 +37,8 @@ router.post(
 );
 router.post(
   "/my-info/set-avatar",
-  upload.array("media", 1),
+  upload(storage("uploads/avatars")).single("media"),
+  verifyJWT,
   setAvatarController
 );
 

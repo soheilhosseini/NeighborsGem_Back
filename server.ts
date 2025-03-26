@@ -9,6 +9,7 @@ import credentials from "./middleware/credentials";
 import log from "./middleware/log";
 import connectDB from "./database/db";
 import apis from "./routes/api/api";
+import createEssentialDirectories from "./utils/createDirectories";
 const PORT = process.env.PORT || 3500;
 
 const app = express();
@@ -30,13 +31,10 @@ app.use(express.static(join(__dirname, "/public")));
 
 connectDB();
 
+createEssentialDirectories();
+
 app.use("/api", apis);
 app.use("/uploads", express.static("uploads"));
-// app.use("/auth", require("./routes/auth"));
-// app.use("/refresh", require("./routes/refresh"));
-// app.use("/logout", require("./routes/logout"));
-// app.use(verifyJWT);
-// app.use("/me", require("./routes/api/me"));
 
 app.all("*", (_, res) => {
   res.sendStatus(404);

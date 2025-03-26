@@ -1,9 +1,12 @@
 import { Request, Response } from "express";
 import UserModel from "../../model/user";
 import AddressModel from "../../model/address";
+import FileModel from "../../model/file";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import messagesConstant from "../../constants/messages";
+import sharp from "sharp";
+import path from "path";
 
 dotenv.config();
 
@@ -24,7 +27,7 @@ const getMyInfoController = async (req: Request, res: Response) => {
         }
         const user = await UserModel.findOne({
           _id: decoded._id,
-        }).select("-refresh_tokens");
+        }).populate("avatar");
         res.json({ message: "", data: { user } });
       }
     );
@@ -221,24 +224,52 @@ const deleteAddressController = async (req: Request, res: Response) => {
 };
 
 const setAvatarController = async (req: Request, res: Response) => {
-  const { main_id, avatar } = req.body;
-
-  if (!avatar) {
+  const { main_id } = req.body;
+  if (!req.file) {
     res.sendStatus(400);
     return;
   }
+  const file = req.file as Express.Multer.File;
 
-  const files = req.files as Express.Multer.File[];
-
-  if (!files || files.length === 0) {
+  if (!file) {
     res.status(400).json({ error: "No files uploaded" });
     return;
   }
 
+  const originalPath = file.path;
+  const ext = path.extname(file.originalname);
+  const nameWithoutExt = path.basename(file.originalname, ext);
+  const thumbnailName = `${Date.now()}-${nameWithoutExt}-thumb${ext}`;
+  const thumbnailPath = path.join(
+    __dirname,
+    "..",
+    "..",
+    "uploads",
+    "avatars",
+    "thumbnails",
+    thumbnailName
+  );
   try {
-    await UserModel.updateOne({
-      _id: main_id
-    }, {$set:{avatar: }});
+    await sharp(originalPath)
+      .resize(160) // width of 300px, auto height
+      .jpeg({ quality: 60 }) // lower quality = smaller size
+      .toFile(thumbnailPath);
+
+    const createdAvatar = await FileModel.insertOne({
+      created_at: Date.now(),
+      file_path: `/uploads/avatars/${file.filename}`,
+      thumbnail_path: `/uploads/avatars/thumbnails/${thumbnailName}`,
+      mime_type: file.mimetype,
+      created_by: main_id,
+    });
+    console.log(createdAvatar, main_id);
+    await UserModel.updateOne(
+      {
+        _id: main_id,
+      },
+      { $set: { avatar: createdAvatar._id } }
+    );
+    res.status(201).json({ message: messagesConstant.en.avatarUpdated });
   } catch (err) {
     res.sendStatus(500);
   }

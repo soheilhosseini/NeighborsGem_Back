@@ -21,3 +21,7 @@
 20250326	00:25:43	95e4bb3f-78d4-4fa0-a58e-ed8b99a60913	MulterError: Unexpected field
 20250326	00:27:14	37f2c372-d117-4904-97c4-7629c074797c	MulterError: Unexpected field
 20250326	00:34:14	755ff163-0dda-4982-8a8c-641ddb26714e	Error: ENOENT: no such file or directory, open 'D:\Programming\uploads\1742936654522-photo_2018-12-03_00-45-06.jpg'
+20250326	12:27:22	eb5f4ae1-acdb-4a7f-88ef-9f8ee34c07a2	Error: ENOENT: no such file or directory, open 'D:\Programming\nodejs_web_server-main\utils\uploads\posts\1742979442522-photo_2025-03-21_16-51-25.jpg'
+20250326	12:28:02	e7b865e9-6557-42c1-ac23-ea69aba93d1b	Error: ENOENT: no such file or directory, open 'D:\Programming\nodejs_web_server-main\utils\uploads\posts\1742979482315-photo_2025-03-21_16-51-25.jpg'
+20250326	15:16:03	1675eba7-7d79-4117-bd1f-1ae61f76d4ac	Error: ENOENT: no such file or directory, open 'D:\Programming\uploads\avatars\1742989563604-photo_2025-03-21_16-51-25.jpg'
+20250326	17:19:17	5dba3332-a067-43d9-af41-17a522937417	Error: Invalid file type

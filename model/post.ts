@@ -1,14 +1,16 @@
 import mongoose from "mongoose";
 import FileSchema from "./file";
-import AddressSchema from "./address";
 
 const PostSchema = new mongoose.Schema({
-  address_id: { type: String, ref: "Address", require: true },
+  address: { type: String, ref: "Address", require: true },
   title: { type: String },
   description: { type: String },
   created_at: { type: Date, default: Date.now },
   categories: {},
-  medias: [String],
+  medias: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "File",
+  },
   creator_id: { type: Number },
   likes: { type: Array },
   created_by: {

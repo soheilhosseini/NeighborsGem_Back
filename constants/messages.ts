@@ -32,6 +32,9 @@ const messages = {
     AddressDeletedSuccessfuly: "Address Was Deleted Successfuly",
     logout: "See You Soon",
     postHasBeenCreated: "The Post Has Been Created",
+    avatarUpdated: "Avatar Has Been Updated",
+    removeReaction: "Reaction Removed",
+    reaction: "Successful",
   },
 };
 
