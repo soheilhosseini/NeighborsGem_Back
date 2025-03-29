@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import FileModel from "../../model/file";
 import UserModel from "../../model/user";
 import PostModel from "../../model/post";
+import CommentModel from "../../model/comment";
 import AddressModel from "../../model/address";
 import ReactionModel from "../../model/Reaction";
 import jwt from "jsonwebtoken";
@@ -193,6 +194,66 @@ const deletePostReactionController = async (req: Request, res: Response) => {
   }
 };
 
+const addNewCommentController = async (req: Request, res: Response) => {
+  const { main_id, _id, text, parent_id } = req.body;
+  if (!_id) {
+    res.sendStatus(400);
+  }
+  try {
+    const comment = await CommentModel.insertOne({
+      created_by: main_id,
+      post_id: _id,
+      text,
+      parent_id,
+    });
+
+    console.log(comment);
+
+    const populateComment = await CommentModel.findOne({
+      _id: comment._id,
+    }).populate({
+      path: "created_by",
+      select: "username _id avatar",
+      populate: {
+        path: "avatar",
+        select: "thumbnail_path",
+      },
+    });
+
+    res.json({
+      message: "",
+      data: { comment: populateComment },
+    });
+  } catch (err) {
+    res.sendStatus(500);
+  }
+};
+
+const getPostsCommentsController = async (req: Request, res: Response) => {
+  const { _id } = req.params;
+  if (!_id) {
+    res.sendStatus(400);
+    return;
+  }
+
+  try {
+    const comments = await CommentModel.find({ post_id: _id })
+      .sort({ created_at: -1 })
+      .populate({
+        path: "created_by",
+        select: "username _id avatar",
+        populate: {
+          path: "avatar",
+          select: "thumbnail_path",
+        },
+      });
+    const count = await CommentModel.countDocuments({ post_id: _id });
+    res.json({ message: "", data: { list: comments, count } });
+  } catch (err) {
+    res.sendStatus(500);
+  }
+};
+
 export {
   addNewPostController,
   getPostsController,
@@ -200,4 +261,6 @@ export {
   setPostReactionController,
   deletePostReactionController,
   getPostDetailsController,
+  addNewCommentController,
+  getPostsCommentsController,
 };
