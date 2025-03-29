@@ -48,10 +48,22 @@ const addNewPostController = async (req: Request, res: Response) => {
 
 const getPostsController = async (req: Request, res: Response) => {
   const { main_id } = req.body;
+  const { address_id } = req.query;
+  let filters = {};
+
+  if (address_id) {
+    filters = {
+      ...filters,
+      address: address_id,
+    };
+  }
+
   const count = await PostModel.find({
+    ...filters,
     created_by: { $ne: main_id },
   }).countDocuments();
   const posts = await PostModel.find({
+    ...filters,
     created_by: { $ne: main_id },
   })
     .populate({
@@ -62,7 +74,7 @@ const getPostsController = async (req: Request, res: Response) => {
         select: "thumbnail_path",
       },
     })
-    .populate("address", "address coordinates")
+    .populate("address", "address coordinate")
     .populate("medias", "file_path mime_type");
 
   const postIds = posts.map((post) => post._id);
@@ -122,7 +134,7 @@ const getPostDetailsController = async (req: Request, res: Response) => {
           select: "thumbnail_path",
         },
       })
-      .populate("address", "address coordinates")
+      .populate("address", "address coordinate")
       .populate("medias", "file_path mime_type");
     res.json({ message: "", data: { post } });
   } catch (err) {
@@ -145,7 +157,7 @@ const getMyPostsController = async (req: Request, res: Response) => {
           select: "thumbnail_path",
         },
       })
-      .populate("address", "address coordinates")
+      .populate("address", "address coordinate")
       .populate("medias", "file_path mime_type");
     const count = await PostModel.countDocuments({ created_by: main_id });
     res.json({ message: "", data: { list: posts, count } });

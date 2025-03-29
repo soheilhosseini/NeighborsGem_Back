@@ -2,7 +2,11 @@ import mongoose from "mongoose";
 import FileSchema from "./file";
 
 const PostSchema = new mongoose.Schema({
-  address: { type: String, ref: "Address", require: true },
+  address: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Address",
+    require: true,
+  },
   title: { type: String },
   description: { type: String },
   created_at: { type: Date, default: Date.now },

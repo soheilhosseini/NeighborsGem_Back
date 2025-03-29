@@ -150,9 +150,9 @@ const verifyUpdatePhoneNumberOTPController = async (
 };
 
 const addNewAddressController = async (req: Request, res: Response) => {
-  const { main_id, address, coordinates } = req.body;
+  const { main_id, address, coordinate } = req.body;
 
-  if (!address || !coordinates) {
+  if (!address || !coordinate) {
     res.sendStatus(400);
   }
   try {
@@ -162,7 +162,7 @@ const addNewAddressController = async (req: Request, res: Response) => {
     );
     await AddressModel.insertOne({
       address,
-      coordinates,
+      coordinate,
       user_id: main_id,
       is_main_address: true,
     });

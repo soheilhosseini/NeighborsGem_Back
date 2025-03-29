@@ -13,27 +13,35 @@ dotenv.config();
 
 const getAllAddressesController = async (req: Request, res: Response) => {
   const { main_id } = req.body;
-  const { limit, in_bbox } = req.query;
+  const { limit = 10, in_bbox } = req.query;
 
   console.log(req.query);
 
-  if (!in_bbox || !limit) {
-    res.sendStatus(400);
-    return;
-  }
+  // if (!in_bbox || !limit) {
+  //   res.sendStatus(400);
+  //   return;
+  // }
 
-  const transformedInBbox = in_bbox.toString().split(",");
+  let filters = {};
 
-  try {
-    const addresses = await AddressModel.find({
-      "coordinates.0": {
+  const transformedInBbox = in_bbox?.toString().split(",");
+  if (transformedInBbox) {
+    filters = {
+      ...filters,
+      "coordinate.0": {
         $gte: Number(transformedInBbox[0]),
         $lte: Number(transformedInBbox[2]),
       },
-      "coordinates.1": {
+      "coordinate.1": {
         $gte: Number(transformedInBbox[1]),
         $lte: Number(transformedInBbox[3]),
       },
+    };
+  }
+
+  try {
+    const addresses = await AddressModel.find({
+      ...filters,
       user_id: { $not: { $eq: main_id } },
     }).limit(+limit);
     res.json({ message: "", data: { list: addresses } });
