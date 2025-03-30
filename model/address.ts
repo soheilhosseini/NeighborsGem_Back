@@ -1,10 +1,23 @@
 import mongoose from "mongoose";
 
-const AddressSchema = new mongoose.Schema({
+export const AddressSchema = new mongoose.Schema({
   address: { type: String },
-  coordinate: { type: Array },
+  location: {
+    type: {
+      type: String, // Always "Point" for GeoJSON format
+      enum: ["Point"], // Only "Point" type is valid for GeoJSON
+      required: true,
+    },
+    coordinates: {
+      type: [Number], // [longitude, latitude] format
+      required: true,
+    },
+  },
   is_main_address: { type: Boolean },
   created_by: { type: mongoose.Schema.Types.ObjectId },
 });
+
+// Ensure that MongoDB creates a 2dsphere index for geo queries
+AddressSchema.index({ coordinate: "2dsphere" });
 
 export default mongoose.model("Address", AddressSchema);

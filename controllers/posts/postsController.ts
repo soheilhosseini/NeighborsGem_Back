@@ -32,12 +32,14 @@ const addNewPostController = async (req: Request, res: Response) => {
   }));
 
   try {
+    const foundAddress = await AddressModel.findOne({ _id: address_id });
+
     const createdFiles = await FileModel.insertMany(editedFiles);
     await PostModel.insertOne({
       title,
       description,
       medias: createdFiles.map((item) => item._id),
-      address: address_id,
+      address: foundAddress,
       created_by: main_id,
     });
   } catch (err) {
@@ -61,7 +63,7 @@ const getMyPostsController = async (req: Request, res: Response) => {
           select: "thumbnail_path",
         },
       })
-      .populate("address", "address coordinate")
+      .populate("address", "address location")
       .populate("medias", "file_path mime_type");
     const count = await PostModel.countDocuments({ created_by: main_id });
     res.json({ message: "", data: { list: posts, count } });
@@ -74,12 +76,18 @@ const getMyPostsController = async (req: Request, res: Response) => {
 const getPostsController = async (req: Request, res: Response) => {
   const { main_id } = req.body;
   const { address_id } = req.query;
+
+  const search = String(req.query.search || "").trim();
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
   let filters = {};
 
   if (address_id) {
     filters = {
       ...filters,
-      address: address_id,
+      "address._id": address_id,
     };
   }
 
@@ -88,72 +96,146 @@ const getPostsController = async (req: Request, res: Response) => {
     is_main_address: true,
   });
 
-  const count = await PostModel.find({
-    ...filters,
-    created_by: { $ne: main_id },
-  }).countDocuments();
-  let posts = await PostModel.find({
-    ...filters,
-    created_by: { $ne: main_id },
-  })
-    .populate({
-      path: "created_by",
-      select: "username _id avatar",
-      populate: {
-        path: "avatar",
-        select: "thumbnail_path",
+  let posts;
+  if (defaultAddress?.location?.coordinates) {
+    try {
+      posts = await PostModel.aggregate([
+        {
+          $geoNear: {
+            near: {
+              type: "Point",
+              coordinates: [
+                defaultAddress.location.coordinates[0],
+                defaultAddress.location.coordinates[1],
+              ],
+            },
+            distanceField: "distance",
+            spherical: true,
+            key: "address.location", // Make sure Post has "address.location" indexed
+          },
+        },
+        {
+          $match: {
+            ...filters,
+            created_by: { $ne: new mongoose.Types.ObjectId(main_id) },
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "created_by",
+            foreignField: "_id",
+            as: "created_by",
+          },
+        },
+        { $unwind: "$created_by" },
+        {
+          $lookup: {
+            from: "files",
+            localField: "created_by.avatar",
+            foreignField: "_id",
+            as: "created_by.avatar",
+          },
+        },
+        {
+          $unwind: {
+            path: "$created_by.avatar",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $lookup: {
+            from: "files",
+            localField: "medias",
+            foreignField: "_id",
+            as: "medias",
+          },
+        },
+        {
+          $sort: { distance: 1, created_at: -1 },
+        },
+        { $skip: skip }, // 👈 Pagination: skip (offset)
+        { $limit: limit }, // 👈 Pagination: limit
+        {
+          $project: {
+            title: 1,
+            description: 1,
+            created_at: 1,
+            distance: 1,
+            "medias.file_path": 1,
+            "medias.mime_type": 1,
+            "created_by.username": 1,
+            "created_by._id": 1,
+            "created_by.avatar.thumbnail_path": 1,
+          },
+        },
+      ]);
+    } catch (err) {
+      console.log(err);
+    }
+  } else {
+    posts = await PostModel.aggregate([
+      {
+        $match: {
+          ...filters,
+          created_by: { $ne: new mongoose.Types.ObjectId(main_id) },
+        },
       },
-    })
-    .populate("address", "address coordinate")
-    .populate("medias", "file_path mime_type")
-    .lean();
-
-  if (defaultAddress) {
-    posts = posts.map((item: any) => ({
-      ...item,
-      distance: distanceCalculator([
-        item.address.coordinate,
-        defaultAddress.coordinate,
-      ]),
-    }));
+      {
+        $lookup: {
+          from: "users",
+          localField: "created_by",
+          foreignField: "_id",
+          as: "created_by",
+        },
+      },
+      { $unwind: "$created_by" },
+      {
+        $lookup: {
+          from: "files",
+          localField: "created_by.avatar",
+          foreignField: "_id",
+          as: "created_by.avatar",
+        },
+      },
+      {
+        $unwind: {
+          path: "$created_by.avatar",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "files",
+          localField: "medias",
+          foreignField: "_id",
+          as: "medias",
+        },
+      },
+      {
+        $sort: { created_at: -1 },
+      },
+      { $skip: skip }, // 👈 Pagination: skip (offset)
+      { $limit: limit }, // 👈 Pagination: limit
+      {
+        $project: {
+          title: 1,
+          description: 1,
+          created_at: 1,
+          "medias.file_path": 1,
+          "medias.mime_type": 1,
+          "created_by.username": 1,
+          "created_by._id": 1,
+          "created_by.avatar.thumbnail_path": 1,
+        },
+      },
+    ]);
   }
 
-  // const postIds = posts.map((post) => post._id);
-  // const reactions = await ReactionModel.aggregate([
-  //   { $match: { post: { $in: postIds } } },
-  //   {
-  //     $group: {
-  //       _id: { post: "$post", type: "$type" },
-  //       count: { $sum: 1 },
-  //     },
-  //   },
-  // ]);
-
-  // const countsMap = new Map();
-
-  // // Group counts like { postId: { like: X, dislike: Y } }
-  // for (const r of reactions) {
-  //   const postId = r._id.post.toString();
-  //   const type = r._id.type;
-  //   const count = r.count;
-
-  //   if (!countsMap.has(postId)) countsMap.set(postId, { like: 0, dislike: 0 });
-  //   countsMap.get(postId)[type] = count;
-  // }
-
-  // // Merge counts into posts
-  // const postsWithReactions = posts.map((post) => {
-  //   const postObj = post.toObject();
-  //   const reaction = countsMap.get(post._id.toString()) || {
-  //     like: 0,
-  //     dislike: 0,
-  //   };
-  //   return {
-  //     ...postObj,
-  //     likes_count: reaction.like,
-  //     dislikes_count: reaction.dislike,
-  //   };
-  // });
+  const count = await PostModel.countDocuments({
+    ...filters,
+    created_by: { $ne: new mongoose.Types.ObjectId(main_id) },
+  });
 
   res.json({ message: "", data: { list: posts, count } });
 };
@@ -175,7 +257,7 @@ const getPostDetailsController = async (req: Request, res: Response) => {
           select: "thumbnail_path",
         },
       })
-      .populate("address", "address coordinate")
+      .populate("address", "address location")
       .populate("medias", "file_path mime_type");
     res.json({ message: "", data: { post } });
   } catch (err) {

@@ -28,11 +28,11 @@ const getAllAddressesController = async (req: Request, res: Response) => {
   if (transformedInBbox) {
     filters = {
       ...filters,
-      "coordinate.0": {
+      "location.coordinates.0": {
         $gte: Number(transformedInBbox[0]),
         $lte: Number(transformedInBbox[2]),
       },
-      "coordinate.1": {
+      "location.coordinates.1": {
         $gte: Number(transformedInBbox[1]),
         $lte: Number(transformedInBbox[3]),
       },

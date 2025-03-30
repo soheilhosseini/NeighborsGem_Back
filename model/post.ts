@@ -1,12 +1,9 @@
 import mongoose from "mongoose";
 import FileSchema from "./file";
+import { AddressSchema } from "./address";
 
 const PostSchema = new mongoose.Schema({
-  address: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Address",
-    require: true,
-  },
+  address: AddressSchema,
   title: { type: String },
   description: { type: String },
   created_at: { type: Date, default: Date.now },
@@ -23,5 +20,8 @@ const PostSchema = new mongoose.Schema({
     require: true,
   },
 });
+
+PostSchema.index({ "address.location": "2dsphere" });
+PostSchema.index({ title: "text", description: "text" });
 
 export default mongoose.model("Post", PostSchema);
