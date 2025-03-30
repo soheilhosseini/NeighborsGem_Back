@@ -42,7 +42,7 @@ const getAllAddressesController = async (req: Request, res: Response) => {
   try {
     const addresses = await AddressModel.find({
       ...filters,
-      user_id: { $not: { $eq: main_id } },
+      created_by: { $not: { $eq: main_id } },
     }).limit(+limit);
     res.json({ message: "", data: { list: addresses } });
   } catch (err) {

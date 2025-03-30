@@ -157,13 +157,13 @@ const addNewAddressController = async (req: Request, res: Response) => {
   }
   try {
     await AddressModel.updateMany(
-      { is_main_address: true, user_id: main_id },
+      { is_main_address: true, created_by: main_id },
       { $set: { is_main_address: false } }
     );
     await AddressModel.insertOne({
       address,
       coordinate,
-      user_id: main_id,
+      created_by: main_id,
       is_main_address: true,
     });
     res
@@ -178,7 +178,7 @@ const getMyAddressesController = async (req: Request, res: Response) => {
   const { main_id } = req.body;
   console.log(main_id);
   try {
-    const addresses = (await AddressModel.find({ user_id: main_id })) || [];
+    const addresses = (await AddressModel.find({ created_by: main_id })) || [];
     res.json({ message: "", data: { addresses } });
   } catch (err) {
     console.log(err);
@@ -194,7 +194,7 @@ const setDefaultAddressController = async (req: Request, res: Response) => {
   }
   try {
     await AddressModel.updateMany(
-      { is_main_address: true, user_id: main_id },
+      { is_main_address: true, created_by: main_id },
       { $set: { is_main_address: false } }
     );
     await AddressModel.updateOne({ _id }, { $set: { is_main_address: true } });
@@ -213,7 +213,7 @@ const deleteAddressController = async (req: Request, res: Response) => {
     return;
   }
   try {
-    await AddressModel.deleteOne({ user_id: main_id, _id });
+    await AddressModel.deleteOne({ created_by: main_id, _id });
     res
       .status(204)
       .json({ message: messagesConstant.en.AddressDeletedSuccessfuly });
