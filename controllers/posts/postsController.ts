@@ -87,7 +87,7 @@ const getPostsController = async (req: Request, res: Response) => {
   if (address_id) {
     filters = {
       ...filters,
-      "address._id": address_id,
+      "address._id": new mongoose.Types.ObjectId(address_id.toString()),
     };
   }
 
@@ -178,7 +178,6 @@ const getPostsController = async (req: Request, res: Response) => {
       {
         $match: {
           ...filters,
-          created_by: { $ne: new mongoose.Types.ObjectId(main_id) },
         },
       },
       {
@@ -235,6 +234,7 @@ const getPostsController = async (req: Request, res: Response) => {
   const count = await PostModel.countDocuments({
     ...filters,
     created_by: { $ne: new mongoose.Types.ObjectId(main_id) },
+    "address.location": { $exists: true },
   });
 
   res.json({ message: "", data: { list: posts, count } });

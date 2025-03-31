@@ -179,7 +179,7 @@ const getMyAddressesController = async (req: Request, res: Response) => {
   console.log(main_id);
   try {
     const addresses = (await AddressModel.find({ created_by: main_id })) || [];
-    res.json({ message: "", data: { addresses } });
+    res.json({ message: "", data: { list: addresses } });
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
