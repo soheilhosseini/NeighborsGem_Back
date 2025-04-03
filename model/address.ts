@@ -18,6 +18,6 @@ export const AddressSchema = new mongoose.Schema({
 });
 
 // Ensure that MongoDB creates a 2dsphere index for geo queries
-AddressSchema.index({ coordinate: "2dsphere" });
+AddressSchema.index({ location: "2dsphere" });
 
 export default mongoose.model("Address", AddressSchema);

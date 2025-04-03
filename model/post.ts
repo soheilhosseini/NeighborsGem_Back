@@ -22,6 +22,5 @@ const PostSchema = new mongoose.Schema({
 });
 
 PostSchema.index({ "address.location": "2dsphere" });
-PostSchema.index({ title: "text", description: "text" });
 
 export default mongoose.model("Post", PostSchema);
