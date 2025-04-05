@@ -4,7 +4,7 @@ import UserModel from "../../model/user";
 import PostModel from "../../model/post";
 import CommentModel from "../../model/comment";
 import AddressModel from "../../model/address";
-import ReactionModel from "../../model/Reaction";
+import ReactionModel from "../../model/reaction";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import messagesConstant from "../../constants/messages";

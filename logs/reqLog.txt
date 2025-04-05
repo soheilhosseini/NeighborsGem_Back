@@ -4228,3 +4228,4 @@
 20250327	02:22:52	a0edc428-68f7-4cf0-b1e0-dd7085d4cf7c	GET	 https://localhost:3000	 /api/post/category/
 20250327	02:22:52	64a86e0a-aff8-49b5-9ed4-9d2e755881ba	GET	 undefined	 /uploads/posts/1743008389650-photo_2018-12-03_00-45-06.jpg
 20250327	02:22:52	fb27b12a-80a1-4e0c-93c7-5c8608833df5	GET	 undefined	 /uploads/avatars/thumbnails/1743007599397-photo_2018-12-03_00-45-06-thumb.jpg
+20250403	21:40:08	a1416490-2c67-490c-8eba-df839911dfd2	OPTIONS	 http://192.168.1.6:3000	 /api/me/my-info

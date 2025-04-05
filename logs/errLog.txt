@@ -25,3 +25,4 @@
 20250326	12:28:02	e7b865e9-6557-42c1-ac23-ea69aba93d1b	Error: ENOENT: no such file or directory, open 'D:\Programming\nodejs_web_server-main\utils\uploads\posts\1742979482315-photo_2025-03-21_16-51-25.jpg'
 20250326	15:16:03	1675eba7-7d79-4117-bd1f-1ae61f76d4ac	Error: ENOENT: no such file or directory, open 'D:\Programming\uploads\avatars\1742989563604-photo_2025-03-21_16-51-25.jpg'
 20250326	17:19:17	5dba3332-a067-43d9-af41-17a522937417	Error: Invalid file type
+20250403	21:40:08	c613fdd0-bf87-4575-992c-32b97125effb	Error: Not allowed by CORS
