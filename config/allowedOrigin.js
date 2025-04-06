@@ -5,6 +5,8 @@ const allowedOrigins = [
   "https://localhost:3000",
   "http://46.249.102.84:3000",
   "https://46.249.102.84:3000",
+  "http://nesgem.com/",
+  "https://nesgem.com/",
 ];
 
 module.exports = allowedOrigins;
