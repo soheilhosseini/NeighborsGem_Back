@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import AvatarSchema from "./avatar";
+import bcrypt from "bcrypt";
 
 const UserSchema = new mongoose.Schema({
   first_name: { type: String },
@@ -10,6 +10,13 @@ const UserSchema = new mongoose.Schema({
   createAt: { type: Date, default: Date.now },
   password: { type: String, trim: true },
   avatar: { type: mongoose.Schema.Types.ObjectId, ref: "File" },
+});
+
+UserSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  const salt = await bcrypt.genSalt(10);
+  if (this.password) this.password = await bcrypt.hash(this.password, salt);
+  next();
 });
 
 export default mongoose.model("User", UserSchema);

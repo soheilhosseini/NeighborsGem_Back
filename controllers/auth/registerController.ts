@@ -165,8 +165,6 @@ const handleSetPassword = async (req: Request, res: Response) => {
   //   res.status(400).json({ message: messagesConstant.en.invalidPassword });
   // }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-
   const foundedTempUser = await TempUserModel.findOne({
     $or: [{ phone_number: user_identity }, { email: user_identity }],
   });
@@ -176,7 +174,7 @@ const handleSetPassword = async (req: Request, res: Response) => {
       username: foundedTempUser.username,
       email: foundedTempUser.email,
       phone_number: foundedTempUser.phone_number,
-      password: hashedPassword,
+      password,
       // refresh_tokens: [newRefreshToken],
     };
     const newUser = await UserModel.insertOne(payload);

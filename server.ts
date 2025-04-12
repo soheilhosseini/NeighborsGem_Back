@@ -13,7 +13,7 @@ import createEssentialDirectories from "./utils/createDirectories";
 const PORT = process.env.PORT || 3500;
 
 const app = express();
-
+app.set("trust proxy", 1);
 //middleware for cookies
 app.use(cookieParser());
 
