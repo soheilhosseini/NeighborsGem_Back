@@ -6,7 +6,7 @@ export const FileSchema = new mongoose.Schema(
     thumbnail_path: { type: String }, // For images or pdf previews
     mime_type: { type: String },
     size: Number,
-    created_by: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }
 );

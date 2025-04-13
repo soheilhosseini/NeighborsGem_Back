@@ -13,6 +13,7 @@ dotenv.config();
 
 const getAllAddressesController = async (req: Request, res: Response) => {
   const { main_id } = req.auth;
+
   const { limit = 10, in_bbox } = req.query;
 
   // if (!in_bbox || !limit) {
@@ -40,7 +41,7 @@ const getAllAddressesController = async (req: Request, res: Response) => {
   try {
     const addresses = await AddressModel.find({
       ...filters,
-      created_by: { $not: { $eq: main_id } },
+      createdBy: { $not: { $eq: main_id } },
     }).limit(+limit);
     res.json({ message: "", data: { list: addresses } });
   } catch (err) {

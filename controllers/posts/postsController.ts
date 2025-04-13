@@ -28,7 +28,7 @@ const addNewPostController = async (req: Request, res: Response) => {
     file_path: `/uploads/posts/${file.filename}`,
     mime_type: file.mimetype,
     size: file.size,
-    created_by: main_id,
+    createdBy: main_id,
   }));
 
   try {
@@ -44,7 +44,7 @@ const addNewPostController = async (req: Request, res: Response) => {
       description,
       medias: createdFiles.map((item) => item._id),
       address: foundAddress,
-      created_by: main_id,
+      createdBy: main_id,
     });
     res.status(201).json({
       message: messagesConstant.en.postHasBeenCreated,
@@ -61,10 +61,10 @@ const getMyPostsController = async (req: Request, res: Response) => {
 
   try {
     const posts = await PostModel.find({
-      created_by: main_id,
+      createdBy: main_id,
     })
       .populate({
-        path: "created_by",
+        path: "createdBy",
         select: "username _id avatar",
         populate: {
           path: "avatar",
@@ -73,7 +73,7 @@ const getMyPostsController = async (req: Request, res: Response) => {
       })
       .populate("address", "address location")
       .populate("medias", "file_path mime_type");
-    const count = await PostModel.countDocuments({ created_by: main_id });
+    const count = await PostModel.countDocuments({ createdBy: main_id });
     res.json({ message: "", data: { list: posts, count } });
   } catch (err) {
     console.log(err);
@@ -83,7 +83,6 @@ const getMyPostsController = async (req: Request, res: Response) => {
 
 const getPostsController = async (req: Request, res: Response) => {
   const { main_id } = req.auth;
-
   const { address_id } = req.query;
 
   const search = String(req.query.search || "").trim();
@@ -101,7 +100,7 @@ const getPostsController = async (req: Request, res: Response) => {
   }
 
   const defaultAddress = await AddressModel.findOne({
-    created_by: main_id,
+    createdBy: main_id,
     is_main_address: true,
   });
 
@@ -126,29 +125,29 @@ const getPostsController = async (req: Request, res: Response) => {
         {
           $match: {
             ...filters,
-            created_by: { $ne: new mongoose.Types.ObjectId(main_id) },
+            createdBy: { $ne: new mongoose.Types.ObjectId(main_id) },
           },
         },
         {
           $lookup: {
             from: "users",
-            localField: "created_by",
+            localField: "createdBy",
             foreignField: "_id",
-            as: "created_by",
+            as: "createdBy",
           },
         },
-        { $unwind: "$created_by" },
+        { $unwind: "$createdBy" },
         {
           $lookup: {
             from: "files",
-            localField: "created_by.avatar",
+            localField: "createdBy.avatar",
             foreignField: "_id",
-            as: "created_by.avatar",
+            as: "createdBy.avatar",
           },
         },
         {
           $unwind: {
-            path: "$created_by.avatar",
+            path: "$createdBy.avatar",
             preserveNullAndEmptyArrays: true,
           },
         },
@@ -173,9 +172,9 @@ const getPostsController = async (req: Request, res: Response) => {
             distance: 1,
             "medias.file_path": 1,
             "medias.mime_type": 1,
-            "created_by.username": 1,
-            "created_by._id": 1,
-            "created_by.avatar.thumbnail_path": 1,
+            "createdBy.username": 1,
+            "createdBy._id": 1,
+            "createdBy.avatar.thumbnail_path": 1,
           },
         },
       ]);
@@ -192,23 +191,23 @@ const getPostsController = async (req: Request, res: Response) => {
       {
         $lookup: {
           from: "users",
-          localField: "created_by",
+          localField: "createdBy",
           foreignField: "_id",
-          as: "created_by",
+          as: "createdBy",
         },
       },
-      { $unwind: "$created_by" },
+      { $unwind: "$createdBy" },
       {
         $lookup: {
           from: "files",
-          localField: "created_by.avatar",
+          localField: "createdBy.avatar",
           foreignField: "_id",
-          as: "created_by.avatar",
+          as: "createdBy.avatar",
         },
       },
       {
         $unwind: {
-          path: "$created_by.avatar",
+          path: "$createdBy.avatar",
           preserveNullAndEmptyArrays: true,
         },
       },
@@ -232,9 +231,9 @@ const getPostsController = async (req: Request, res: Response) => {
           created_at: 1,
           "medias.file_path": 1,
           "medias.mime_type": 1,
-          "created_by.username": 1,
-          "created_by._id": 1,
-          "created_by.avatar.thumbnail_path": 1,
+          "createdBy.username": 1,
+          "createdBy._id": 1,
+          "createdBy.avatar.thumbnail_path": 1,
         },
       },
     ]);
@@ -242,7 +241,7 @@ const getPostsController = async (req: Request, res: Response) => {
 
   const count = await PostModel.countDocuments({
     ...filters,
-    created_by: { $ne: new mongoose.Types.ObjectId(main_id) },
+    createdBy: { $ne: new mongoose.Types.ObjectId(main_id) },
     "address.location": { $exists: true },
   });
 
@@ -259,7 +258,7 @@ const getPostDetailsController = async (req: Request, res: Response) => {
   try {
     const post = await PostModel.findOne({ _id })
       .populate({
-        path: "created_by",
+        path: "createdBy",
         select: "username _id avatar",
         populate: {
           path: "avatar",
@@ -286,7 +285,7 @@ const setPostReactionController = async (req: Request, res: Response) => {
   try {
     await ReactionModel.insertOne({
       post_id: _id,
-      created_by: main_id,
+      createdBy: main_id,
       type,
     });
     res.status(200).json({ messagesConstant: messagesConstant.en.reaction });
@@ -307,7 +306,7 @@ const deletePostReactionController = async (req: Request, res: Response) => {
   try {
     await ReactionModel.deleteOne({
       post_id: _id,
-      created_by: main_id,
+      createdBy: main_id,
     });
     res
       .status(204)
@@ -326,7 +325,7 @@ const addNewCommentController = async (req: Request, res: Response) => {
   }
   try {
     const comment = await CommentModel.insertOne({
-      created_by: main_id,
+      createdBy: main_id,
       post_id: _id,
       text,
       parent_id,
@@ -335,7 +334,7 @@ const addNewCommentController = async (req: Request, res: Response) => {
     const populateComment = await CommentModel.findOne({
       _id: comment._id,
     }).populate({
-      path: "created_by",
+      path: "createdBy",
       select: "username _id avatar",
       populate: {
         path: "avatar",
@@ -364,7 +363,7 @@ const getPostsCommentsController = async (req: Request, res: Response) => {
     const comments = await CommentModel.find({ post_id: _id })
       .sort({ created_at: -1 })
       .populate({
-        path: "created_by",
+        path: "createdBy",
         select: "username _id avatar",
         populate: {
           path: "avatar",

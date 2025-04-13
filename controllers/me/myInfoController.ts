@@ -162,13 +162,13 @@ const addNewAddressController = async (req: Request, res: Response) => {
   }
   try {
     await AddressModel.updateMany(
-      { is_main_address: true, created_by: main_id },
+      { is_main_address: true, createdBy: main_id },
       { $set: { is_main_address: false } }
     );
     await AddressModel.insertOne({
       address,
       location,
-      created_by: main_id,
+      createdBy: main_id,
       is_main_address: true,
     });
     res
@@ -183,7 +183,7 @@ const addNewAddressController = async (req: Request, res: Response) => {
 const getMyAddressesController = async (req: Request, res: Response) => {
   const { main_id } = req.auth;
   try {
-    const addresses = (await AddressModel.find({ created_by: main_id })) || [];
+    const addresses = (await AddressModel.find({ createdBy: main_id })) || [];
     res.json({ message: "", data: { list: addresses } });
   } catch (err) {
     console.log(err);
@@ -200,7 +200,7 @@ const setDefaultAddressController = async (req: Request, res: Response) => {
   }
   try {
     await AddressModel.updateMany(
-      { is_main_address: true, created_by: main_id },
+      { is_main_address: true, createdBy: main_id },
       { $set: { is_main_address: false } }
     );
     await AddressModel.updateOne({ _id }, { $set: { is_main_address: true } });
@@ -221,7 +221,7 @@ const deleteAddressController = async (req: Request, res: Response) => {
     return;
   }
   try {
-    await AddressModel.deleteOne({ created_by: main_id, _id });
+    await AddressModel.deleteOne({ createdBy: main_id, _id });
     res
       .status(204)
       .json({ message: messagesConstant.en.AddressDeletedSuccessfuly });
@@ -268,7 +268,7 @@ const setAvatarController = async (req: Request, res: Response) => {
       file_path: `/uploads/avatars/${file.filename}`,
       thumbnail_path: `/uploads/avatars/thumbnails/${thumbnailName}`,
       mime_type: file.mimetype,
-      created_by: main_id,
+      createdBy: main_id,
     });
     await UserModel.updateOne(
       {

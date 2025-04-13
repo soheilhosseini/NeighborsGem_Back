@@ -15,7 +15,7 @@ export const AddressSchema = new mongoose.Schema(
       },
     },
     is_main_address: { type: Boolean },
-    created_by: { type: mongoose.Schema.Types.ObjectId },
+    createdBy: { type: mongoose.Schema.Types.ObjectId },
   },
   { timestamps: true }
 );

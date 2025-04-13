@@ -20,8 +20,6 @@ const verifyJWT = (req: Request, res: Response, next: NextFunction): void => {
           res.status(401).json({ message: messagesConstant.en.invalidToken });
           return;
         }
-
-        // @ts-ignore
         req.auth = { main_id: decoded._id };
         next();
       }

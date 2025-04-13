@@ -21,7 +21,7 @@ export const randomPostGenerator = async () => {
       title: generateRandomText(130),
       description: generateRandomText(300),
       medias: [],
-      created_by: "67e430a1c045a6234d771331",
+      createdBy: "67e430a1c045a6234d771331",
     });
   }
   return array;
@@ -41,7 +41,7 @@ const randomLocationGenerator = () => {
         coordinates: [Math.random() * 360 - 180, Math.random() * 180 - 90],
       },
       is_main_address: false,
-      created_by: "67e430a1c045a6234d771331",
+      createdBy: "67e430a1c045a6234d771331",
     });
   }
   return array;

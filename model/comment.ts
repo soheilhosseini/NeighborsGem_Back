@@ -9,7 +9,7 @@ const CommentSchema = new mongoose.Schema(
       require: true,
     },
     parent_id: { type: mongoose.Schema.Types.ObjectId, ref: "Comment" },
-    created_by: {
+    createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       require: true,

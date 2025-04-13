@@ -8,19 +8,16 @@ const publicAuthentication = (
   next: NextFunction
 ): void => {
   const access_token = req.cookies.access_token;
+  req.auth = {};
 
   if (process.env.ACCESS_TOKEN_SECRET && access_token) {
     jwt.verify(
       access_token,
       process.env.ACCESS_TOKEN_SECRET,
       (err: jwt.VerifyErrors | null, decoded: any) => {
-        if (err) {
-          next();
-          return;
+        if (!err) {
+          req.auth = { main_id: decoded._id };
         }
-
-        // @ts-ignore
-        req.auth = { main_id: decoded._id };
         next();
       }
     );

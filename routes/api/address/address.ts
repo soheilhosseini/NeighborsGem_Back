@@ -1,8 +1,8 @@
 import express from "express";
 const router = express.Router();
 import { getAllAddressesController } from "../../../controllers/address/addressController";
-import publicAuthentication from "../../../middleware/publicAuthentication";
+import verifyJWT from "../../../middleware/verifyJWT";
 
-router.get("/", publicAuthentication, getAllAddressesController);
+router.get("/", verifyJWT, getAllAddressesController);
 
 export default router;

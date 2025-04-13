@@ -12,7 +12,7 @@ const PostSchema = new mongoose.Schema(
       ref: "File",
     },
     categories: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }],
-    created_by: {
+    createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
