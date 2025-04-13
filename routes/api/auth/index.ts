@@ -3,9 +3,7 @@ const router = Router();
 
 import { default as registerRouter } from "./register";
 import { default as loginRouter } from "./login";
-import { authLimiter } from "../../../middleware/rateLimit";
 
-router.use(authLimiter);
 router.use(registerRouter);
 router.use(loginRouter);
 
