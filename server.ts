@@ -11,10 +11,13 @@ import connectDB from "./database/db";
 import apis from "./routes/api/api";
 import createEssentialDirectories from "./utils/createDirectories";
 import { generalLimiter } from "./middleware/rateLimit";
+import helmet from "helmet";
+
 const PORT = process.env.PORT || 3500;
 
 const app = express();
 app.set("trust proxy", 1);
+app.use(helmet());
 app.use(generalLimiter);
 //middleware for cookies
 app.use(cookieParser());
