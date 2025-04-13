@@ -7,6 +7,7 @@ const usersDB = {
 
 const fsPromises = require("fs").promises;
 const path = require("path");
+const { sameSite } = require("../../utils/generals");
 
 const handleLogout = async (req, res) => {
   const cookies = req.cookie;
@@ -36,7 +37,7 @@ const handleLogout = async (req, res) => {
   res.clearCookie("jwt", {
     httpOnly: true,
     secure: true,
-    sameSite: "strict",
+    sameSite: sameSite(),
   }); //secure : true
   res.sendStatus(204);
 };

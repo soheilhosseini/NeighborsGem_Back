@@ -6,8 +6,8 @@ export const phoneNumberValidator = (phoneNumber: string) =>
 export const isValidPassword = (password: string) =>
   validator.isStrongPassword(password, {
     minLength: 3,
-    // minLowercase: 1,
-    // minUppercase: 1,
-    // minNumbers: 1,
-    // minSymbols: 1,
+    minLowercase: 1,
+    minUppercase: 1,
+    minNumbers: 1,
+    minSymbols: 1,
   });

@@ -265,7 +265,6 @@ const setAvatarController = async (req: Request, res: Response) => {
       .toFile(thumbnailPath);
 
     const createdAvatar = await FileModel.insertOne({
-      created_at: Date.now(),
       file_path: `/uploads/avatars/${file.filename}`,
       thumbnail_path: `/uploads/avatars/thumbnails/${thumbnailName}`,
       mime_type: file.mimetype,

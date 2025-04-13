@@ -12,6 +12,7 @@ import {
 import dotenv from "dotenv";
 import { generateAccessToken } from "../../utils/auth";
 import jwt from "jsonwebtoken";
+import { sameSite } from "../../utils/generals";
 
 dotenv.config();
 
@@ -49,7 +50,7 @@ const loginWithPasswordController = async (req: Request, res: Response) => {
         httpOnly: true,
         secure: true,
         maxAge: 24 * 60 * 60 * 1000, // 1 day
-        sameSite: "strict",
+        sameSite: sameSite(),
       });
       res.sendStatus(200);
     }
@@ -116,7 +117,7 @@ const loginWithOTPCheckOTPController = async (req: Request, res: Response) => {
         httpOnly: true,
         secure: true,
         maxAge: 24 * 60 * 60 * 1000, // 1 day
-        sameSite: "strict",
+        sameSite: sameSite(),
       });
       res.sendStatus(200);
     }
@@ -131,7 +132,7 @@ const logoutController = (req: Request, res: Response) => {
     path: "/",
     httpOnly: true,
     secure: true,
-    sameSite: "strict",
+    sameSite: sameSite(),
   });
   res.status(204).json({ message: messagesConstant.en.logout });
 };

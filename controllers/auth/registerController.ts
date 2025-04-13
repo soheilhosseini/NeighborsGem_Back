@@ -9,6 +9,7 @@ import {
 } from "../../utils/validation";
 import dotenv from "dotenv";
 import { generateAccessToken } from "../../utils/auth";
+import { sameSite } from "../../utils/generals";
 
 dotenv.config();
 
@@ -181,7 +182,7 @@ const handleSetPassword = async (req: Request, res: Response) => {
           httpOnly: true,
           secure: true,
           maxAge: 24 * 60 * 60 * 1000, // 1 day
-          sameSite: "strict",
+          sameSite: sameSite(),
         });
       }
 

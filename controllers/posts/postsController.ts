@@ -28,7 +28,6 @@ const addNewPostController = async (req: Request, res: Response) => {
     file_path: `/uploads/posts/${file.filename}`,
     mime_type: file.mimetype,
     size: file.size,
-    created_at: Date.now(),
     created_by: main_id,
   }));
 

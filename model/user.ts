@@ -8,7 +8,6 @@ const UserSchema = new mongoose.Schema(
     email: { type: String, trim: true, sparse: true, unique: true },
     phone_number: { type: String, trim: true, sparse: true, unique: true },
     username: { type: String, trim: true, sparse: true, unique: true },
-    created_at: { type: Date, default: Date.now },
     password: { type: String, trim: true },
     avatar: { type: mongoose.Schema.Types.ObjectId, ref: "File" },
   },
