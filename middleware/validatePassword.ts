@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { Request, Response, NextFunction } from "express";
+import messagesConstant from "../constants/messages";
 
 const passwordSchema = z.object({
   user_identity: z.string().min(3),
@@ -15,7 +16,7 @@ export const validatePassword = (
     passwordSchema.parse(req.body);
     next();
   } catch (err: any) {
-    res.status(400).json({ error: err.errors });
+    res.status(400).json({ message: messagesConstant.en.invalidPassword });
     return;
   }
 };

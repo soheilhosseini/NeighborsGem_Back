@@ -12,8 +12,7 @@ const messages = {
     emptyUsername: "User Name Is Empty",
     existUsername: "User Name Is Not Available",
     emptyPassword: "Password Is Empty",
-    invalidPassword:
-      "Weak password. Use at least 8 characters with uppercase, lowercase, numbers, and special symbols.",
+    invalidPassword: "Invalid Password",
     completeRegistration: "Welcome!",
     invalidToken: "Invalid Token",
     userInfoUpdated: "Updated Successfuly",
@@ -36,6 +35,7 @@ const messages = {
     removeReaction: "Reaction Removed",
     reaction: "Successful",
     tooManyRequest: "Too many login attempts. Please try again later",
+    tooSmall: "Too small Password",
   },
 };
 

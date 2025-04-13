@@ -156,9 +156,9 @@ const handleSetPassword = async (req: Request, res: Response) => {
     res.status(404).json({ message: messagesConstant.en.emptyPassword });
   }
 
-  // if (!isValidPassword(password)) {
-  //   res.status(400).json({ message: messagesConstant.en.invalidPassword });
-  // }
+  if (!isValidPassword(password)) {
+    res.status(400).json({ message: messagesConstant.en.invalidPassword });
+  }
 
   const foundedTempUser = await TempUserModel.findOne({
     $or: [{ phone_number: user_identity }, { email: user_identity }],

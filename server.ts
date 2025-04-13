@@ -17,7 +17,12 @@ const PORT = process.env.PORT || 3500;
 
 const app = express();
 app.set("trust proxy", 1);
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginOpenerPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  })
+);
 app.use(generalLimiter);
 //middleware for cookies
 app.use(cookieParser());
