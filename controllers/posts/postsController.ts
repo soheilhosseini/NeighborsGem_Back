@@ -160,7 +160,7 @@ const getPostsController = async (req: Request, res: Response) => {
           },
         },
         {
-          $sort: { distance: 1, created_at: -1 },
+          $sort: { distance: 1, createdAt: -1 },
         },
         { $skip: skip }, // 👈 Pagination: skip (offset)
         { $limit: limit }, // 👈 Pagination: limit
@@ -168,7 +168,7 @@ const getPostsController = async (req: Request, res: Response) => {
           $project: {
             title: 1,
             description: 1,
-            created_at: 1,
+            createdAt: 1,
             distance: 1,
             "medias.file_path": 1,
             "medias.mime_type": 1,
@@ -220,7 +220,7 @@ const getPostsController = async (req: Request, res: Response) => {
         },
       },
       {
-        $sort: { created_at: -1 },
+        $sort: { createdAt: -1 },
       },
       { $skip: skip }, // 👈 Pagination: skip (offset)
       { $limit: limit }, // 👈 Pagination: limit
@@ -228,7 +228,7 @@ const getPostsController = async (req: Request, res: Response) => {
         $project: {
           title: 1,
           description: 1,
-          created_at: 1,
+          createdAt: 1,
           "medias.file_path": 1,
           "medias.mime_type": 1,
           "createdBy.username": 1,
@@ -361,7 +361,7 @@ const getPostsCommentsController = async (req: Request, res: Response) => {
 
   try {
     const comments = await CommentModel.find({ post_id: _id })
-      .sort({ created_at: -1 })
+      .sort({ createdAt: -1 })
       .populate({
         path: "createdBy",
         select: "username _id avatar",
