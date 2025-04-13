@@ -6,10 +6,14 @@ import {
   handleSetUserName,
   handleSetPassword,
 } from "../../../controllers/auth/registerController";
+import { validatePreRegister } from "../../../middleware/validatePreRegister";
+import { validateOtp } from "../../../middleware/validateOtp";
+import { validateUsername } from "../../../middleware/validateUsername";
+import { validatePassword } from "../../../middleware/validatePassword";
 
-router.post("/pre-register", handlePreRegister);
-router.post("/register-verify-otp", handleOtp);
-router.post("/register-set-username", handleSetUserName);
-router.post("/register-set-password", handleSetPassword);
+router.post("/pre-register", validatePreRegister, handlePreRegister);
+router.post("/register-verify-otp", validateOtp, handleOtp);
+router.post("/register-set-username", validateUsername, handleSetUserName);
+router.post("/register-set-password", validatePassword, handleSetPassword);
 
 export default router;
