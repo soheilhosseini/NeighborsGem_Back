@@ -44,6 +44,7 @@ const addNewPostController = async (req: Request, res: Response) => {
       created_by: main_id,
     });
   } catch (err) {
+    console.log(err);
     res.sendStatus(500);
   }
 
@@ -264,6 +265,7 @@ const getPostDetailsController = async (req: Request, res: Response) => {
       .populate("medias", "file_path mime_type");
     res.json({ message: "", data: { post } });
   } catch (err) {
+    console.log(err);
     res.sendStatus(500);
   }
 };
@@ -284,6 +286,7 @@ const setPostReactionController = async (req: Request, res: Response) => {
     });
     res.status(200).json({ messagesConstant: messagesConstant.en.reaction });
   } catch (err) {
+    console.log(err);
     res.sendStatus(500);
   }
 };
@@ -305,6 +308,7 @@ const deletePostReactionController = async (req: Request, res: Response) => {
       .status(204)
       .json({ messagesConstant: messagesConstant.en.removeReaction });
   } catch (err) {
+    console.log(err);
     res.sendStatus(500);
   }
 };
@@ -339,6 +343,7 @@ const addNewCommentController = async (req: Request, res: Response) => {
       data: { comment: populateComment },
     });
   } catch (err) {
+    console.log(err);
     res.sendStatus(500);
   }
 };
@@ -364,6 +369,7 @@ const getPostsCommentsController = async (req: Request, res: Response) => {
     const count = await CommentModel.countDocuments({ post_id: _id });
     res.json({ message: "", data: { list: comments, count } });
   } catch (err) {
+    console.log(err);
     res.sendStatus(500);
   }
 };

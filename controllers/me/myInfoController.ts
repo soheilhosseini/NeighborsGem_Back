@@ -67,6 +67,7 @@ const updateMyInfoController = async (req: Request, res: Response) => {
     );
     res.status(200).json({ message: messagesConstant.en.userInfoUpdated });
   } catch (err) {
+    console.log(err);
     res.sendStatus(500);
   }
 };
@@ -98,6 +99,7 @@ const verifyUpdateEmailOTPController = async (req: Request, res: Response) => {
       await UserModel.updateOne({ _id: main_id }, { $set: { email } });
       res.json({ message: messagesConstant.en.emailUpdatedSuccessfuly });
     } catch (err) {
+      console.log(err);
       res.sendStatus(500);
     }
   } else {
@@ -141,6 +143,7 @@ const verifyUpdatePhoneNumberOTPController = async (
       await UserModel.updateOne({ _id: main_id }, { $set: { phone_number } });
       res.json({ message: messagesConstant.en.phoneNumberUpdatedSuccessfuly });
     } catch (err) {
+      console.log(err);
       res.sendStatus(500);
     }
   } else {
@@ -172,6 +175,7 @@ const addNewAddressController = async (req: Request, res: Response) => {
       .status(201)
       .json({ message: messagesConstant.en.addressCreatedSuccessfuly });
   } catch (err) {
+    console.log(err);
     res.sendStatus(500);
   }
 };
@@ -203,6 +207,7 @@ const setDefaultAddressController = async (req: Request, res: Response) => {
     res.json({ message: messagesConstant.en.defaultAddressWasSet });
     return;
   } catch (err) {
+    console.log(err);
     res.sendStatus(500);
   }
 };
@@ -222,6 +227,7 @@ const deleteAddressController = async (req: Request, res: Response) => {
       .json({ message: messagesConstant.en.AddressDeletedSuccessfuly });
     return;
   } catch (err) {
+    console.log(err);
     res.sendStatus(500);
   }
 };
@@ -274,6 +280,7 @@ const setAvatarController = async (req: Request, res: Response) => {
     );
     res.status(201).json({ message: messagesConstant.en.avatarUpdated });
   } catch (err) {
+    console.log(err);
     res.sendStatus(500);
   }
 };

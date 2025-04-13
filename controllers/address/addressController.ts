@@ -46,6 +46,7 @@ const getAllAddressesController = async (req: Request, res: Response) => {
     }).limit(+limit);
     res.json({ message: "", data: { list: addresses } });
   } catch (err) {
+    console.log(err);
     res.sendStatus(500);
   }
 };
