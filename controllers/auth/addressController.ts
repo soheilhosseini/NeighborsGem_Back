@@ -25,7 +25,7 @@ const getAllAddressesController = async (req: Request, res: Response) => {
   let filters = {};
 
   const transformedInBbox = in_bbox?.toString().split(",");
-  if (transformedInBbox) {
+  if (transformedInBbox && transformedInBbox.length === 4) {
     filters = {
       ...filters,
       "location.coordinates.0": {

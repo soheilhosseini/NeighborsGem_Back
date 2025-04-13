@@ -10,10 +10,12 @@ import log from "./middleware/log";
 import connectDB from "./database/db";
 import apis from "./routes/api/api";
 import createEssentialDirectories from "./utils/createDirectories";
+import { generalLimiter } from "./middleware/rateLimit";
 const PORT = process.env.PORT || 3500;
 
 const app = express();
 app.set("trust proxy", 1);
+app.use(generalLimiter);
 //middleware for cookies
 app.use(cookieParser());
 

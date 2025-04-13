@@ -34,6 +34,10 @@ const addNewPostController = async (req: Request, res: Response) => {
 
   try {
     const foundAddress = await AddressModel.findOne({ _id: address_id });
+    if (!foundAddress) {
+      res.sendStatus(404);
+      return;
+    }
 
     const createdFiles = await FileModel.insertMany(editedFiles);
     await PostModel.insertOne({

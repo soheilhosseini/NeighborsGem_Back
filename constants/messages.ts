@@ -35,6 +35,7 @@ const messages = {
     avatarUpdated: "Avatar Has Been Updated",
     removeReaction: "Reaction Removed",
     reaction: "Successful",
+    tooManyRequest: "Too many login attempts. Please try again later",
   },
 };
 
