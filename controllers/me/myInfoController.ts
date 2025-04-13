@@ -37,7 +37,8 @@ const getMyInfoController = async (req: Request, res: Response) => {
 };
 
 const updateMyInfoController = async (req: Request, res: Response) => {
-  const { main_id, first_name, last_name, username } = req.body;
+  const { first_name, last_name, username } = req.body;
+  const { main_id } = req.auth;
   if ((!first_name || !last_name) && !username) {
     res.status(400).json({ message: messagesConstant.en.emptyRequiredFileds });
     return;
@@ -71,8 +72,8 @@ const updateMyInfoController = async (req: Request, res: Response) => {
 };
 
 const sendUpdateEmailOTPController = async (req: Request, res: Response) => {
-  const { email, main_id } = req.body;
-
+  const { email } = req.body;
+  const { main_id } = req.auth;
   const isDuplicated = await UserModel.findOne({
     email,
     _id: { $not: { $eq: main_id } },
@@ -86,8 +87,8 @@ const sendUpdateEmailOTPController = async (req: Request, res: Response) => {
 };
 
 const verifyUpdateEmailOTPController = async (req: Request, res: Response) => {
-  const { email, otp, main_id } = req.body;
-
+  const { email, otp } = req.body;
+  const { main_id } = req.auth;
   if (!email || !otp) {
     res.sendStatus(400);
   }
@@ -108,8 +109,8 @@ const sendUpdatePhoneNumberOTPController = async (
   req: Request,
   res: Response
 ) => {
-  const { phone_number, main_id } = req.body;
-
+  const { phone_number } = req.body;
+  const { main_id } = req.auth;
   const isDuplicated = await UserModel.findOne({
     phone_number,
     _id: { $not: { $eq: main_id } },
@@ -129,8 +130,8 @@ const verifyUpdatePhoneNumberOTPController = async (
   req: Request,
   res: Response
 ) => {
-  const { phone_number, otp, main_id } = req.body;
-
+  const { phone_number, otp } = req.body;
+  const { main_id } = req.auth;
   if (!phone_number || !otp) {
     res.sendStatus(400);
   }
@@ -150,7 +151,8 @@ const verifyUpdatePhoneNumberOTPController = async (
 };
 
 const addNewAddressController = async (req: Request, res: Response) => {
-  const { main_id, address, location } = req.body;
+  const { address, location } = req.body;
+  const { main_id } = req.auth;
 
   if (!address || !location) {
     res.sendStatus(400);
@@ -175,8 +177,7 @@ const addNewAddressController = async (req: Request, res: Response) => {
 };
 
 const getMyAddressesController = async (req: Request, res: Response) => {
-  const { main_id } = req.body;
-  console.log(main_id);
+  const { main_id } = req.auth;
   try {
     const addresses = (await AddressModel.find({ created_by: main_id })) || [];
     res.json({ message: "", data: { list: addresses } });
@@ -187,7 +188,8 @@ const getMyAddressesController = async (req: Request, res: Response) => {
 };
 
 const setDefaultAddressController = async (req: Request, res: Response) => {
-  const { main_id, _id } = req.body;
+  const { _id } = req.body;
+  const { main_id } = req.auth;
   if (!_id) {
     res.sendStatus(400);
     return;
@@ -206,7 +208,8 @@ const setDefaultAddressController = async (req: Request, res: Response) => {
 };
 
 const deleteAddressController = async (req: Request, res: Response) => {
-  const { main_id, _id } = req.body;
+  const { _id } = req.body;
+  const { main_id } = req.auth;
 
   if (!_id) {
     res.sendStatus(400);
@@ -224,7 +227,7 @@ const deleteAddressController = async (req: Request, res: Response) => {
 };
 
 const setAvatarController = async (req: Request, res: Response) => {
-  const { main_id } = req.body;
+  const { main_id } = req.auth;
   if (!req.file) {
     res.sendStatus(400);
     return;

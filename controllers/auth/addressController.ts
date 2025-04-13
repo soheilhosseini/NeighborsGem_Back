@@ -12,7 +12,7 @@ import messagesConstant from "../../constants/messages";
 dotenv.config();
 
 const getAllAddressesController = async (req: Request, res: Response) => {
-  const { main_id } = req.body;
+  const { main_id } = req.auth;
   const { limit = 10, in_bbox } = req.query;
 
   console.log(req.query);

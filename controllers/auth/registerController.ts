@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
 import messagesConstant from "../../constants/messages";
-import bcrypt from "bcrypt";
-import path from "path";
 import UserModel from "../../model/user";
 import TempUserModel from "../../model/tempUser";
 import {
@@ -169,14 +167,13 @@ const handleSetPassword = async (req: Request, res: Response) => {
     $or: [{ phone_number: user_identity }, { email: user_identity }],
   });
   if (foundedTempUser) {
-    // const newRefreshToken = generateRefreshToken(user_identity);
     const payload = {
       username: foundedTempUser.username,
       email: foundedTempUser.email,
       phone_number: foundedTempUser.phone_number,
       password,
-      // refresh_tokens: [newRefreshToken],
     };
+
     const newUser = await UserModel.insertOne(payload);
     console.log(newUser, "asdfasdfasdf");
     await TempUserModel.deleteOne({ _id: foundedTempUser._id });
@@ -190,12 +187,6 @@ const handleSetPassword = async (req: Request, res: Response) => {
           maxAge: 24 * 60 * 60 * 1000, // 1 day
           sameSite: "none",
         });
-
-        // res.cookie("refreshToken", newRefreshToken, {
-        //   httpOnly: true,
-        //   secure: true,
-        //   maxAge: 7 * 24 * 60 * 60 * 1000,
-        // });
       }
 
       res.status(201).json({
@@ -209,35 +200,4 @@ const handleSetPassword = async (req: Request, res: Response) => {
   }
 };
 
-const handleNewUser = async (req: Request, res: Response) => {
-  // const { user, pwd } = req.body;
-  // if (!user | !pwd)
-  //   return res
-  //     .status(400)
-  //     .json({ message: "Username and Password are required." });
-  // const duplicate = usersDB.users.find((person) => person.username === user);
-  // if (duplicate)
-  //   return res.status(409).json({ message: "User was already created" });
-  // try {
-  //   const hashedPwd = await bcrypt.hash(pwd, 10);
-  //   const newUser = { username: user, password: hashedPwd };
-  //   usersDB.setUsers([...usersDB.users, newUser]);
-  //   await fsPromises.writeFile(
-  //     path.join(__dirname, "..", "model", "users.json"),
-  //     JSON.stringify(usersDB.users)
-  //   );
-  //   console.log(usersDB.users);
-  //   res.status(201).json({ success: `New user ${user} created!` });
-  // } catch (err) {
-  //   res.status(500).json({ message: err.message });
-  // }
-  res.sendStatus(200);
-};
-
-export {
-  handlePreRegister,
-  handleNewUser,
-  handleOtp,
-  handleSetUserName,
-  handleSetPassword,
-};
+export { handlePreRegister, handleOtp, handleSetUserName, handleSetPassword };

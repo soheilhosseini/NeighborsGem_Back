@@ -20,7 +20,7 @@ const publicAuthentication = (
         }
 
         // @ts-ignore
-        req.body = { ...req.body, main_id: decoded._id };
+        req.auth = { main_id: decoded._id };
         next();
       }
     );

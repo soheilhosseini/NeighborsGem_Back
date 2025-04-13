@@ -22,7 +22,7 @@ const verifyJWT = (req: Request, res: Response, next: NextFunction): void => {
         }
 
         // @ts-ignore
-        req.body = { ...req.body, main_id: decoded._id };
+        req.auth = { main_id: decoded._id };
         next();
       }
     );

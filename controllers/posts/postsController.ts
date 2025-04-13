@@ -15,7 +15,8 @@ import mongoose from "mongoose";
 dotenv.config();
 
 const addNewPostController = async (req: Request, res: Response) => {
-  const { main_id, title, description, address_id } = req.body;
+  const { title, description, address_id } = req.body;
+  const { main_id } = req.auth;
   const files = req.files as Express.Multer.File[];
 
   if (!files || files.length === 0) {
@@ -50,7 +51,8 @@ const addNewPostController = async (req: Request, res: Response) => {
 };
 
 const getMyPostsController = async (req: Request, res: Response) => {
-  const { main_id } = req.body;
+  const { main_id } = req.auth;
+
   try {
     const posts = await PostModel.find({
       created_by: main_id,
@@ -74,7 +76,8 @@ const getMyPostsController = async (req: Request, res: Response) => {
 };
 
 const getPostsController = async (req: Request, res: Response) => {
-  const { main_id } = req.body;
+  const { main_id } = req.auth;
+
   const { address_id } = req.query;
 
   const search = String(req.query.search || "").trim();
@@ -266,7 +269,8 @@ const getPostDetailsController = async (req: Request, res: Response) => {
 };
 
 const setPostReactionController = async (req: Request, res: Response) => {
-  const { main_id, _id, type } = req.body;
+  const { _id, type } = req.body;
+  const { main_id } = req.auth;
   if (!_id || !type) {
     res.sendStatus(400);
     return;
@@ -285,7 +289,8 @@ const setPostReactionController = async (req: Request, res: Response) => {
 };
 
 const deletePostReactionController = async (req: Request, res: Response) => {
-  const { main_id, _id } = req.body;
+  const { _id } = req.body;
+  const { main_id } = req.auth;
   if (!_id) {
     res.sendStatus(400);
     return;
@@ -305,7 +310,8 @@ const deletePostReactionController = async (req: Request, res: Response) => {
 };
 
 const addNewCommentController = async (req: Request, res: Response) => {
-  const { main_id, _id, text, parent_id } = req.body;
+  const { _id, text, parent_id } = req.body;
+  const { main_id } = req.auth;
   if (!_id) {
     res.sendStatus(400);
   }

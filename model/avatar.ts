@@ -1,7 +1,9 @@
 import mongoose from "mongoose";
-const AvatarSchema = new mongoose.Schema({
-  created_at: { type: Date, default: Date.now },
-  avatar: String,
-  avatar_thumbnail: String,
-});
+const AvatarSchema = new mongoose.Schema(
+  {
+    avatar: String,
+    avatar_thumbnail: String,
+  },
+  { timestamps: true }
+);
 export default AvatarSchema;

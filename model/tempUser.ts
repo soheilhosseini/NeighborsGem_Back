@@ -5,7 +5,7 @@ const TempUserSchema = new mongoose.Schema({
   phone_number: { type: String, trim: true, sparse: true },
   username: { type: String, trim: true, sparse: true },
   address: { type: String },
-  createAt: { type: Date, default: Date.now, expires: 30000 },
+  created_at: { type: Date, default: Date.now, expires: 30000 },
   otp: { type: String, default: "123" },
   successfulOpt: { type: Boolean, default: false },
 });
