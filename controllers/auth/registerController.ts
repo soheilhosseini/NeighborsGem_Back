@@ -14,7 +14,6 @@ dotenv.config();
 
 const handlePreRegister = async (req: Request, res: Response) => {
   const { user_identity } = req.body;
-  console.log(user_identity);
   if (!user_identity) {
     res
       .status(400)
@@ -40,8 +39,6 @@ const handlePreRegister = async (req: Request, res: Response) => {
   const foundedTempUser = await TempUserModel.findOne({
     $or: [{ phone_number: user_identity }, { email: user_identity }],
   });
-
-  console.log(foundedTempUser);
 
   if (!foundedTempUser) {
     const isPhoneNumberProvided = !isNaN(user_identity);
@@ -175,7 +172,6 @@ const handleSetPassword = async (req: Request, res: Response) => {
     };
 
     const newUser = await UserModel.insertOne(payload);
-    console.log(newUser, "asdfasdfasdf");
     await TempUserModel.deleteOne({ _id: foundedTempUser._id });
     if (process.env.ACCESS_TOKEN_SECRET) {
       const access_token = generateAccessToken(newUser._id.toString());
@@ -185,7 +181,7 @@ const handleSetPassword = async (req: Request, res: Response) => {
           httpOnly: true,
           secure: true,
           maxAge: 24 * 60 * 60 * 1000, // 1 day
-          sameSite: "none",
+          sameSite: "strict",
         });
       }
 

@@ -33,7 +33,7 @@ const handleLogout = async (req, res) => {
     path.join(__dirname, "..", "model", "users.json"),
     JSON.stringify(usersDB.users)
   );
-  res.clearCookie("jwt", { httpOnly: true, secure: true, sameSite: "None" }); //secure : true
+  res.clearCookie("jwt", { httpOnly: true, secure: true, sameSite: "strict" }); //secure : true
   res.sendStatus(204);
 };
 

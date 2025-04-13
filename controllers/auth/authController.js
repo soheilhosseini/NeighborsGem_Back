@@ -24,7 +24,6 @@ const handleLogin = async (req, res) => {
   }
 
   const match = await bcrypt.compare(pwd, foundUser.password);
-  console.log("123");
   if (match) {
     const accessToken = jwt.sign(
       { username: foundUser.username },
@@ -48,7 +47,7 @@ const handleLogin = async (req, res) => {
     res.cookie("jwt", refreshToken, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
-      sameSite: "None",
+      sameSite: "strict",
       secure: true,
     });
     res.json({ accessToken });

@@ -15,8 +15,6 @@ const getAllAddressesController = async (req: Request, res: Response) => {
   const { main_id } = req.auth;
   const { limit = 10, in_bbox } = req.query;
 
-  console.log(req.query);
-
   // if (!in_bbox || !limit) {
   //   res.sendStatus(400);
   //   return;

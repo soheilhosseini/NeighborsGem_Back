@@ -49,7 +49,7 @@ const loginWithPasswordController = async (req: Request, res: Response) => {
         httpOnly: true,
         secure: true,
         maxAge: 24 * 60 * 60 * 1000, // 1 day
-        sameSite: "none",
+        sameSite: "strict",
       });
       res.sendStatus(200);
     }
@@ -116,7 +116,7 @@ const loginWithOTPCheckOTPController = async (req: Request, res: Response) => {
         httpOnly: true,
         secure: true,
         maxAge: 24 * 60 * 60 * 1000, // 1 day
-        sameSite: "none",
+        sameSite: "strict",
       });
       res.sendStatus(200);
     }
@@ -131,7 +131,7 @@ const logoutController = (req: Request, res: Response) => {
     path: "/",
     httpOnly: true,
     secure: true,
-    sameSite: "none",
+    sameSite: "strict",
   });
   res.status(204).json({ message: messagesConstant.en.logout });
 };

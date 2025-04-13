@@ -271,7 +271,6 @@ const setAvatarController = async (req: Request, res: Response) => {
       mime_type: file.mimetype,
       created_by: main_id,
     });
-    console.log(createdAvatar, main_id);
     await UserModel.updateOne(
       {
         _id: main_id,
