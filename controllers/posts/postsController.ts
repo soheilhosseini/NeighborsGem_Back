@@ -40,19 +40,21 @@ const addNewPostController = async (req: Request, res: Response) => {
     }
 
     const createdFiles = await FileModel.insertMany(editedFiles);
-    await PostModel.insertOne({
+    const newPost = await PostModel.insertOne({
       title,
       description,
       medias: createdFiles.map((item) => item._id),
       address: foundAddress,
       created_by: main_id,
     });
+    res.status(201).json({
+      message: messagesConstant.en.postHasBeenCreated,
+      data: { post: newPost },
+    });
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
   }
-
-  res.status(201).json({ message: messagesConstant.en.postHasBeenCreated });
 };
 
 const getMyPostsController = async (req: Request, res: Response) => {
