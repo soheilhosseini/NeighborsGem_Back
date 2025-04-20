@@ -19,30 +19,27 @@ const addNewPostController = async (req: Request, res: Response) => {
   const { main_id } = req.auth;
   const files = req.files as Express.Multer.File[];
 
-  if (!files || files.length === 0) {
-    res.status(400).json({ error: "No files uploaded" });
-    return;
-  }
-
-  const editedFiles = files.map((file) => ({
-    file_path: `/uploads/posts/${file.filename}`,
-    mime_type: file.mimetype,
-    size: file.size,
-    createdBy: main_id,
-  }));
-
   try {
     const foundAddress = await AddressModel.findOne({ _id: address_id });
     if (!foundAddress) {
       res.sendStatus(404);
       return;
     }
+    let createdFiles;
+    if (files) {
+      const editedFiles = files.map((file) => ({
+        file_path: `/uploads/posts/${file.filename}`,
+        mime_type: file.mimetype,
+        size: file.size,
+        createdBy: main_id,
+      }));
+      createdFiles = await FileModel.insertMany(editedFiles);
+    }
 
-    const createdFiles = await FileModel.insertMany(editedFiles);
     const newPost = await PostModel.insertOne({
       title,
       description,
-      medias: createdFiles.map((item) => item._id),
+      medias: createdFiles?.map((item) => item._id) || [],
       address: foundAddress,
       createdBy: main_id,
     });

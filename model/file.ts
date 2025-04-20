@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { InferSchemaType } from "mongoose";
 
 export const FileSchema = new mongoose.Schema(
   {
@@ -10,4 +10,6 @@ export const FileSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-export default mongoose.model("File", FileSchema);
+type FileDoc = InferSchemaType<typeof FileSchema>;
+export type FileType = mongoose.HydratedDocument<FileDoc>;
+export default mongoose.model<FileType>("File", FileSchema);
