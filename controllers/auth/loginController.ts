@@ -79,10 +79,10 @@ const loginWithOTPGetUserIdentityController = async (
     ],
   });
 
-  if (!foundedUser) {
-    res.status(404).json({ message: messagesConstant.en.loginUserNotFound });
-    return;
-  }
+  // if (!foundedUser) {
+  //   res.status(404).json({ message: messagesConstant.en.loginUserNotFound });
+  //   return;
+  // }
 
   res.json({ message: messagesConstant.en.optSent });
 };
@@ -105,7 +105,7 @@ const loginWithOTPCheckOTPController = async (req: Request, res: Response) => {
   });
 
   if (!foundedUser) {
-    res.status(404).json({ message: messagesConstant.en.expiredOtp });
+    res.status(404).json({ message: messagesConstant.en.wrongOtp });
     return;
   }
 
