@@ -6,3 +6,4 @@ import publicAuthentication from "../../../middleware/publicAuthentication";
 router.get("/", publicAuthentication, getAllAddressesController);
 
 export default router;
+// 46.249.102.84

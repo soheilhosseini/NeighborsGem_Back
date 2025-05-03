@@ -25,6 +25,7 @@ const messages = {
     phoneNumberIsNotAvailable: "Phone Number Is Not Available",
     loginUserIdentityIsEmpty: "Email, Phone Number or User Name is require",
     loginUserNotFound: "User Not Found",
+    userOrPasswordIsWrong: "User Or Password Is Wrong",
     loginWithPasswordWrongInputs: "Inputs Are Invalid",
     addressCreatedSuccessfuly: "Address was Created Successfuly",
     defaultAddressWasSet: "Default Address Was Set",

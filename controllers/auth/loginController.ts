@@ -34,7 +34,9 @@ const loginWithPasswordController = async (req: Request, res: Response) => {
   });
 
   if (!foundedUser) {
-    res.status(409).json({ message: messagesConstant.en.loginUserNotFound });
+    res
+      .status(409)
+      .json({ message: messagesConstant.en.userOrPasswordIsWrong });
     return;
   }
 
