@@ -12,6 +12,7 @@ import {
   setDefaultAddressController,
   deleteAddressController,
   setAvatarController,
+  updateMyPasswordController,
 } from "../../../controllers/me/myInfoController";
 import { upload, storage } from "../../../utils/multer"; // adjust path
 import verifyJWT from "../../../middleware/verifyJWT";
@@ -41,5 +42,6 @@ router.post(
   verifyJWT,
   setAvatarController
 );
+router.put("/my-info/password", verifyJWT, updateMyPasswordController);
 
 export default router;

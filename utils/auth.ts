@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { sameSite } from "./generals";
+import { Response } from "express";
 
 dotenv.config();
 
@@ -10,9 +12,14 @@ export function generateAccessToken(_id: string) {
     });
 }
 
-// export function generateRefreshToken(user_identity: string) {
-//   if (process.env.REFRESH_SECRET)
-//     return jwt.sign(user_identity, process.env.REFRESH_SECRET, {
-//       expiresIn: "7d",
-//     });
-// }
+export function addAccessTokenToCookie(res: Response, access_token?: string) {
+  if (access_token)
+    return res.cookie("access_token", access_token, {
+      path: "/",
+      httpOnly: true,
+      secure: true,
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      sameSite: sameSite(),
+    });
+  else throw new Error();
+}

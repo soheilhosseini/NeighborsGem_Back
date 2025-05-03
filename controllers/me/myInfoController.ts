@@ -7,6 +7,8 @@ import dotenv from "dotenv";
 import messagesConstant from "../../constants/messages";
 import sharp from "sharp";
 import path from "path";
+import bcrypt from "bcrypt";
+import { isValidPassword } from "../../utils/validation";
 
 dotenv.config();
 
@@ -27,7 +29,9 @@ const getMyInfoController = async (req: Request, res: Response) => {
         }
         const user = await UserModel.findOne({
           _id: decoded._id,
-        }).populate("avatar");
+        })
+          .select("-password")
+          .populate("avatar");
         res.json({ message: "", data: { user } });
       }
     );
@@ -65,6 +69,50 @@ const updateMyInfoController = async (req: Request, res: Response) => {
       { $set: updateFileds },
       { new: true }
     );
+    res.status(200).json({ message: messagesConstant.en.userInfoUpdated });
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+};
+
+const updateMyPasswordController = async (req: Request, res: Response) => {
+  const { currentPassword, newPassword } = req.body;
+  const { main_id } = req.auth;
+  if (!newPassword) {
+    res.status(400).json({ message: messagesConstant.en.emptyRequiredFileds });
+    return;
+  }
+
+  const foundedUser = await UserModel.findOne({ _id: main_id });
+
+  if (!foundedUser) {
+    res.sendStatus(400);
+    return;
+  }
+  let isPasswordMatch;
+  if (foundedUser.password) {
+    if (!currentPassword) {
+      res.status(400).json({ message: messagesConstant.en.wrongPassword });
+      return;
+    }
+    isPasswordMatch = await bcrypt.compare(
+      currentPassword,
+      foundedUser.password as string
+    );
+    if (!isPasswordMatch) {
+      res.status(400).json({ message: messagesConstant.en.wrongPassword });
+      return;
+    }
+  }
+
+  if (!isValidPassword(newPassword)) {
+    res.status(400).json({ message: messagesConstant.en.invalidPassword });
+    return;
+  }
+  try {
+    foundedUser.password = newPassword;
+    await foundedUser.save();
     res.status(200).json({ message: messagesConstant.en.userInfoUpdated });
   } catch (err) {
     console.log(err);
@@ -286,6 +334,7 @@ const setAvatarController = async (req: Request, res: Response) => {
 export {
   getMyInfoController,
   updateMyInfoController,
+  updateMyPasswordController,
   sendUpdateEmailOTPController,
   verifyUpdateEmailOTPController,
   sendUpdatePhoneNumberOTPController,

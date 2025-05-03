@@ -37,6 +37,8 @@ const messages = {
     reaction: "Successful",
     tooManyRequest: "Too many login attempts. Please try again later",
     tooSmall: "Too small Password",
+    invalidEmail: "Unvalid Email",
+    wrongPassword: "Wrong Password",
   },
 };
 

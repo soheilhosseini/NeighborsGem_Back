@@ -1,6 +1,7 @@
 import express from "express";
 const router = express.Router();
 import {
+  loginWithGoogleController,
   loginWithOTPCheckOTPController,
   loginWithOTPGetUserIdentityController,
   loginWithPasswordController,
@@ -19,6 +20,7 @@ router.post(
   authLimiter,
   loginWithOTPCheckOTPController
 );
+router.post("/google", authLimiter, loginWithGoogleController);
 
 router.post("/logout", logoutController);
 
