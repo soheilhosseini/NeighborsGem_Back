@@ -218,6 +218,27 @@ const loginWithGoogleController = async (req: Request, res: Response) => {
   }
 };
 
+const recaptchaController = async (req: Request, res: Response) => {
+  const { token } = req.body;
+  if (!token) {
+    res.sendStatus(400);
+    return;
+  }
+  try {
+    const secretKey = process.env.RECAPTCHA_SECRET_KEY;
+    const verificationUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${token}`;
+    const googleRes = await fetch(verificationUrl, { method: "POST" });
+    const result = await googleRes.json();
+    if (result.success) {
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(400);
+    }
+  } catch (err) {
+    res.status(500).json({ success: false, error: "Verification error" });
+  }
+};
+
 const logoutController = (req: Request, res: Response) => {
   res.clearCookie("access_token", {
     path: "/",
@@ -233,5 +254,6 @@ export {
   loginWithOTPGetUserIdentityController,
   loginWithOTPCheckOTPController,
   loginWithGoogleController,
+  recaptchaController,
   logoutController,
 };

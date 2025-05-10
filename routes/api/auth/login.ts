@@ -6,6 +6,7 @@ import {
   loginWithOTPGetUserIdentityController,
   loginWithPasswordController,
   logoutController,
+  recaptchaController,
 } from "../../../controllers/auth/loginController";
 import { authLimiter } from "../../../middleware/rateLimit";
 
@@ -22,6 +23,7 @@ router.post(
 );
 router.post("/google", authLimiter, loginWithGoogleController);
 
+router.post("/recaptcha", recaptchaController);
 router.post("/logout", logoutController);
 
 export default router;
