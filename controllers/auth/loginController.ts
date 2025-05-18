@@ -16,8 +16,10 @@ import { addAccessTokenToCookie, generateAccessToken } from "../../utils/auth";
 import jwt from "jsonwebtoken";
 import { sameSite } from "../../utils/generals";
 import { Readable } from "stream";
-
+import { OAuth2Client } from "google-auth-library";
 dotenv.config();
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const loginWithPasswordController = async (req: Request, res: Response) => {
   const { user_identity, password } = req.body;
@@ -129,23 +131,31 @@ const loginWithOTPCheckOTPController = async (req: Request, res: Response) => {
 };
 
 const loginWithGoogleController = async (req: Request, res: Response) => {
-  const { access_token } = req.body;
+  const { credential } = req.body;
 
-  if (!access_token) {
+  if (!credential) {
     res.sendStatus(400);
     return;
   }
-
-  const googleUserInfo = await fetch(
-    "https://www.googleapis.com/oauth2/v3/userinfo",
-    {
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-      },
+  let googleUserInfo;
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    googleUserInfo = ticket?.getPayload();
+    if (!googleUserInfo) {
+      res.sendStatus(400);
+      return;
     }
-  );
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(400);
+    return
+  }
 
-  const userInfo = await googleUserInfo.json();
+
+  const userInfo = googleUserInfo;
 
   if (!userInfo || !userInfo.email_verified) {
     res.status(400).json({ message: messagesConstant.en.invalidEmail });
