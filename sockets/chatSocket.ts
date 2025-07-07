@@ -7,7 +7,6 @@ import MessageDeliveryModel from "../model/messageDelivery";
 function chatSocket(io: Server, socket: Socket) {
   // Client Sent a message
   socket.on("message", async ({ content, chatId }) => {
-    console.log(content, chatId);
     const userId = socket.userId;
     try {
       let chat = await ChatModel.findOne({
@@ -22,7 +21,7 @@ function chatSocket(io: Server, socket: Socket) {
       // Save message to DB
       const savedMessage = await MessageModel.create({
         chatId,
-        sender: userId,
+        createdBy: userId,
         content,
         createdAt: new Date(),
       });

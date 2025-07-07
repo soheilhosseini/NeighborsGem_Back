@@ -7,7 +7,7 @@ const MessageSchema = new Schema(
       ref: "Chat",
       required: true,
     },
-    sender: {
+    createdBy: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
@@ -22,7 +22,6 @@ const MessageSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Post",
     },
-    readBy: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
   { timestamps: true }
 );

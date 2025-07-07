@@ -8,7 +8,7 @@ import verifyJWT from "../../../middleware/verifyJWT";
 
 const router = express.Router();
 router.get("/post-chatId", verifyJWT, getPostsChatIdController);
-router.get("/:id", verifyJWT, getAllMessagesController);
+router.get("/:_id/messages", verifyJWT, getAllMessagesController);
 router.get("/", verifyJWT, getAllChatsController);
 
 export default router;

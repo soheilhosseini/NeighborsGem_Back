@@ -29,22 +29,31 @@ const getAllChatsController = async (req: Request, res: Response) => {
 
 const getAllMessagesController = async (req: Request, res: Response) => {
   const { _id } = req.params;
+  const { main_id } = req.auth;
   try {
-    const posts = await MessageModel.find({
+    const chat = await ChatModel.findOne({
       _id,
-    })
-      .populate({
-        path: "createdBy",
-        select: "username _id avatar",
-        populate: {
-          path: "avatar",
-          select: "thumbnail_path",
-        },
-      })
-      .populate("address", "address location")
-      .populate("medias", "file_path mime_type");
+      participants: { $in: main_id },
+    });
+
+    if (!chat) {
+      res.sendStatus(404);
+      return;
+    }
+
+    const messages = await MessageModel.find({
+      chatId: _id,
+    }).populate({
+      path: "createdBy",
+      select: "username avatar",
+      populate: {
+        path: "avatar",
+        select: "thumbnail_path",
+      },
+    });
+
     const count = await MessageModel.countDocuments({ _id });
-    res.json({ message: "", data: { list: posts, count } });
+    res.json({ message: "", data: { list: messages, count } });
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
