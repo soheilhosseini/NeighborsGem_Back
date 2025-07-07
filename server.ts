@@ -12,20 +12,22 @@ import apis from "./routes/api/api";
 import createEssentialDirectories from "./utils/createDirectories";
 import { generalLimiter } from "./middleware/rateLimit";
 import helmet from "helmet";
+import socketInitializer from "./socket";
 
 const PORT = process.env.PORT || 3500;
 
 const app = express();
 app.set("trust proxy", 1);
-app.use(
-  helmet({
-    crossOriginOpenerPolicy: false,
-    crossOriginResourcePolicy: { policy: "cross-origin" },
-  })
-);
+// app.use(
+//   helmet({
+//     crossOriginOpenerPolicy: false,
+//     crossOriginResourcePolicy: { policy: "cross-origin" },
+//   })
+// );
 app.use(generalLimiter);
 //middleware for cookies
 app.use(cookieParser());
+const server = socketInitializer(app);
 
 // custom middleware logger
 app.use(log);
@@ -51,4 +53,4 @@ app.all("*", (_, res) => {
 
 app.use(errorHandler);
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
