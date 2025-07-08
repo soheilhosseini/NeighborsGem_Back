@@ -51,8 +51,8 @@ const socketInitializer = (app: Express) => {
   io.on("connection", (socket) => {
     console.log("socket connection");
     socket.on("register", () => {
-      socket.join(`user-${socket.userId}`);
       console.log(`🟢 New connection: ${socket.userId}`);
+      socket.join(`user-${socket.userId}`);
       sendUndeliveredMessages(socket);
     });
     chatSocket(io, socket);

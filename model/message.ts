@@ -13,7 +13,7 @@ const MessageSchema = new Schema(
       required: true,
     },
     content: String,
-    replyTo: Schema.Types.ObjectId,
+    replyTo: { type: Schema.Types.ObjectId, ref: "Message" },
     filesId: {
       type: [Schema.Types.ObjectId],
       ref: "File",

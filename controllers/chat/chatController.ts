@@ -11,14 +11,19 @@ const getAllChatsController = async (req: Request, res: Response) => {
   try {
     const chats = await ChatModel.find({
       participants: { $in: main_id },
-    }).populate({
-      path: "createdBy",
-      select: "username _id avatar",
-      populate: {
-        path: "avatar",
-        select: "thumbnail_path",
-      },
-    });
+    })
+      //FIX ME: it will populate all memebers. its not good aproach for group chats with lots of memebers
+      .populate({
+        path: "participants",
+        select: "username _id avatar first_name last_name email",
+        populate: {
+          path: "avatar",
+          select: "thumbnail_path",
+        },
+      })
+      .populate({
+        path: "lastMessage",
+      });
     const count = await ChatModel.countDocuments({ createdBy: main_id });
     res.json({ message: "", data: { list: chats, count } });
   } catch (err) {
@@ -43,14 +48,16 @@ const getAllMessagesController = async (req: Request, res: Response) => {
 
     const messages = await MessageModel.find({
       chatId: _id,
-    }).populate({
-      path: "createdBy",
-      select: "username avatar",
-      populate: {
-        path: "avatar",
-        select: "thumbnail_path",
-      },
-    });
+    })
+      .populate({
+        path: "createdBy",
+        select: "username avatar",
+        populate: {
+          path: "avatar",
+          select: "thumbnail_path",
+        },
+      })
+      .sort({ createdAt: -1 });
 
     const count = await MessageModel.countDocuments({ _id });
     res.json({ message: "", data: { list: messages, count } });
