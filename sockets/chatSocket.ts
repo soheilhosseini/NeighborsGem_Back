@@ -12,7 +12,7 @@ function chatSocket(io: Server, socket: Socket) {
       let chat = await ChatModel.findOne({
         _id: chatId,
       });
-      
+
       if (!chat) {
         socket.emit("error", { msg: "Server error" });
         return;
@@ -25,7 +25,11 @@ function chatSocket(io: Server, socket: Socket) {
         content,
         createdAt: new Date(),
       });
-      
+
+      const populatedMessage = await MessageModel.findById(
+        savedMessage._id
+      ).populate("createdBy");
+
       await MessageDeliveryModel.insertMany(
         chat.participants.map((participantId) => ({
           messageId: savedMessage._id,
@@ -33,7 +37,7 @@ function chatSocket(io: Server, socket: Socket) {
           status: "pending",
         }))
       );
-      
+
       await ChatModel.updateOne(
         { _id: chatId },
         { lastMessage: savedMessage._id }
@@ -42,8 +46,8 @@ function chatSocket(io: Server, socket: Socket) {
       // Broadcast to all participants
       const rooms = io.sockets.adapter.rooms;
       console.log(rooms);
-      
-      callback({ status: "ok"})
+
+      callback({ status: "ok" });
       chat.participants.forEach(async (participantId) => {
         const sockets = await io.in(`user-${participantId}`).fetchSockets();
         const isUserOnline = sockets.length > 0;
@@ -51,12 +55,7 @@ function chatSocket(io: Server, socket: Socket) {
         if (isUserOnline) {
           io.to(`user-${participantId}`).emit("message", {
             chatId: chat._id,
-            message: {
-              _id: savedMessage._id,
-              content: savedMessage.content,
-              sender: userId,
-              createdAt: savedMessage.createdAt,
-            },
+            message: populatedMessage,
           });
           await MessageModel.findByIdAndUpdate(savedMessage._id, {
             $addToSet: { deliveredTo: participantId },
