@@ -44,6 +44,11 @@ app.use(express.static(join(__dirname, "/public")));
 connectDB();
 
 createEssentialDirectories();
+
+app.get('/api', (req, res) => {
+  res.send("I'm alive");
+});
+
 app.use("/api", apis);
 app.use("/uploads", express.static("uploads"));
 
