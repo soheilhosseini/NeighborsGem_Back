@@ -22,9 +22,4 @@ const ChatSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-ChatSchema.index(
-  { participants: 1 },
-  { unique: true, partialFilterExpression: { isGroup: false } }
-);
-
 export default mongoose.model("Chat", ChatSchema);
