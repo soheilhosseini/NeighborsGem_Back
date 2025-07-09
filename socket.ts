@@ -18,7 +18,10 @@ const socketInitializer = (app: Express) => {
 
   const io = new Server(server, {
     cors: {
-      origin: "https://localhost:3000",
+      origin:
+        process.env.NODE_ENV === "development"
+          ? "https://localhost:3000"
+          : "http://localhost: 3000",
       methods: ["GET", "POST"],
       credentials: true,
     },
