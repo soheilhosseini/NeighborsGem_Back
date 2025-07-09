@@ -7,6 +7,8 @@ const allowedOrigins = [
   "https://46.249.102.84:3000",
   "http://www.nesgem.com",
   "https://www.nesgem.com",
+  "http://nesgem.com",
+  "https://nesgem.com",
 ];
 
 module.exports = allowedOrigins;
