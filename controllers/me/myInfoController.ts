@@ -56,8 +56,8 @@ const updateMyInfoController = async (req: Request, res: Response) => {
   if (username) {
     updateFileds.username = username;
     const foundUser = await UserModel.findOne({
-      username,
-      _id: { $not: { $eq: main_id } },
+      username: { $regex: `^${username}$`, $options: "i" },
+      _id: { $ne: main_id },
     });
     if (foundUser) {
       res.status(409).json({ message: messagesConstant.en.existUsername });
@@ -346,8 +346,6 @@ const setAvatarController = async (req: Request, res: Response) => {
         "..",
         deletedFile.thumbnail_path!.slice(1)
       );
-
-      console.log(absoluteFilePath)
 
       fs.unlink(absoluteFilePath, (err) => {
         console.log(err);

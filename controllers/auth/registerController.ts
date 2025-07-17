@@ -130,7 +130,7 @@ const handleSetUserName = async (req: Request, res: Response) => {
 
   const foundedTempUser = await TempUserModel.findOne({
     $or: [
-      // { phone_number: user_identity }      ,
+      // { phone_number: user_identity },
       { email: user_identity },
     ],
   });
@@ -139,7 +139,9 @@ const handleSetUserName = async (req: Request, res: Response) => {
       res.status(400).json({ message: messagesConstant.en.expiredOtp });
       return;
     }
-    const isDuplicated = await UserModel.findOne({ username });
+    const isDuplicated = await UserModel.findOne({
+      username: { $regex: `^${username}$`, $options: "i" },
+    });
     if (isDuplicated) {
       res.status(409).json({ message: messagesConstant.en.existUsername });
       return;
