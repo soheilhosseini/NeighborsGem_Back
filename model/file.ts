@@ -7,6 +7,11 @@ export const FileSchema = new mongoose.Schema(
     mime_type: { type: String },
     size: Number,
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    type: {
+      type: String,
+      enum: ["avatar", "post"],
+      default: "post",
+    },
   },
   { timestamps: true }
 );

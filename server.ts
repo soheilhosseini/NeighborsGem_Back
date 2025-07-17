@@ -45,7 +45,7 @@ connectDB();
 
 createEssentialDirectories();
 
-app.get('/api', (req, res) => {
+app.get("/api", (req, res) => {
   res.send("I'm alive");
 });
 
@@ -58,4 +58,6 @@ app.all("*", (_, res) => {
 
 app.use(errorHandler);
 
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen({ port: PORT, host: "0.0.0.0" }, () =>
+  console.log(`Server running on port ${PORT}`)
+);

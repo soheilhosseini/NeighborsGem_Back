@@ -6,7 +6,8 @@
   "type": "commonjs",
   "scripts": {
     "start": "ts-node server.ts",
-    "dev": "nodemon server.ts"
+    "dev": "nodemon server.ts",
+    "dev-https": "set HTTPS=true && nodemon server.ts"
   },
   "author": "Dave Gray",
   "license": "ISC",

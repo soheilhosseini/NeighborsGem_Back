@@ -1,10 +1,12 @@
 import { Server } from "socket.io";
+import https from "https";
 import http from "http";
 import { chatSocket, sendUndeliveredMessages } from "./sockets/chatSocket";
 import type { Express } from "express";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import * as cookie from "cookie";
+import fs from "fs";
 require("dotenv").config();
 
 declare module "socket.io" {
@@ -14,14 +16,22 @@ declare module "socket.io" {
 }
 
 const socketInitializer = (app: Express) => {
-  const server = http.createServer(app);
+  const options = process.env.HTTPS
+    ? {
+        key: fs.readFileSync("192.168.1.6+1-key.pem"),
+        cert: fs.readFileSync("192.168.1.6+1.pem"),
+      }
+    : {};
+
+  const server = process.env.HTTPS
+    ? https.createServer(options, app)
+    : http.createServer(app);
 
   const io = new Server(server, {
     cors: {
-      origin:
-        process.env.NODE_ENV === "development"
-          ? "https://localhost:3000"
-          : "http://localhost:3000",
+      origin: process.env.HTTPS
+        ? "https://localhost:3000"
+        : "http://localhost:3000",
       methods: ["GET", "POST"],
       credentials: true,
     },

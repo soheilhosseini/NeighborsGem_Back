@@ -9,6 +9,7 @@ import sharp from "sharp";
 import path from "path";
 import bcrypt from "bcrypt";
 import { isValidPassword } from "../../utils/validation";
+import fs from "fs";
 
 dotenv.config();
 
@@ -317,14 +318,48 @@ const setAvatarController = async (req: Request, res: Response) => {
       thumbnail_path: `/uploads/avatars/thumbnails/${thumbnailName}`,
       mime_type: file.mimetype,
       createdBy: main_id,
+      type: "avatar",
     });
-    await UserModel.updateOne(
+    const user = await UserModel.findOneAndUpdate(
       {
         _id: main_id,
       },
-      { $set: { avatar: createdAvatar._id } }
-    );
-    res.status(201).json({ message: messagesConstant.en.avatarUpdated });
+      { $set: { avatar: createdAvatar._id } },
+      { new: true }
+    ).populate({ path: "avatar" });
+
+    const deletedFile = await FileModel.findOneAndDelete({
+      createdBy: main_id,
+      type: "avatar",
+      _id: { $ne: createdAvatar._id },
+    });
+    if (deletedFile) {
+      const absoluteFilePath = path.resolve(
+        __dirname,
+        "..",
+        "..",
+        deletedFile.file_path.slice(1)
+      );
+      const absoluteThumbnailPath = path.resolve(
+        __dirname,
+        "..",
+        "..",
+        deletedFile.thumbnail_path!.slice(1)
+      );
+
+      console.log(absoluteFilePath)
+
+      fs.unlink(absoluteFilePath, (err) => {
+        console.log(err);
+      });
+      fs.unlink(absoluteThumbnailPath, (err) => {
+        console.log(err);
+      });
+    }
+
+    res
+      .status(201)
+      .json({ message: messagesConstant.en.avatarUpdated, data: user });
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
