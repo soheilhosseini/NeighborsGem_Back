@@ -32,7 +32,7 @@ const loginWithPasswordController = async (req: Request, res: Response) => {
 
   const foundedUser = await UserModel.findOne({
     $or: [
-      { phone_number: user_identity },
+      // { phone_number: user_identity },
       { email: user_identity },
       { username: user_identity },
     ],
@@ -78,7 +78,7 @@ const loginWithOTPGetUserIdentityController = async (
 
   const foundedUser = await UserModel.findOne({
     $or: [
-      { phone_number: user_identity },
+      // { phone_number: user_identity },
       { email: user_identity },
       { username: user_identity },
     ],
@@ -103,7 +103,7 @@ const loginWithOTPCheckOTPController = async (req: Request, res: Response) => {
 
   const foundedUser = await UserModel.findOne({
     $or: [
-      { phone_number: user_identity },
+      // { phone_number: user_identity },
       { email: user_identity },
       { username: user_identity },
     ],

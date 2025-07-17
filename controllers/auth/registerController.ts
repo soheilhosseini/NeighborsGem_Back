@@ -24,7 +24,7 @@ const handlePreRegister = async (req: Request, res: Response) => {
 
   const foundedUser = await UserModel.findOne({
     $or: [
-      { phone_number: user_identity },
+      // { phone_number: user_identity },
       { email: user_identity },
       { username: user_identity },
     ],
@@ -38,27 +38,33 @@ const handlePreRegister = async (req: Request, res: Response) => {
   }
 
   const foundedTempUser = await TempUserModel.findOne({
-    $or: [{ phone_number: user_identity }, { email: user_identity }],
+    $or: [
+      // { phone_number: user_identity },
+      { email: user_identity },
+    ],
   });
 
+  if (foundedTempUser) {
+  }
+
   if (!foundedTempUser) {
-    const isPhoneNumberProvided = !isNaN(user_identity);
+    // const isPhoneNumberProvided = !isNaN(user_identity);
     let payload;
-    if (!isPhoneNumberProvided) {
-      if (emailValidator(user_identity)) {
-        payload = { email: user_identity };
-      } else {
-        res.status(400).json({ message: messagesConstant.en.emailIsInvalid });
-        return;
-      }
+    // if (!isPhoneNumberProvided) {
+    if (emailValidator(user_identity)) {
+      payload = { email: user_identity };
     } else {
-      if (phoneNumberValidator(user_identity)) {
-        payload = { phone_number: user_identity };
-      } else {
-        res.status(400).json({ message: messagesConstant.en.phoneIsInvalid });
-        return;
-      }
+      res.status(400).json({ message: messagesConstant.en.emailIsInvalid });
+      return;
     }
+    // } else {
+    //   if (phoneNumberValidator(user_identity)) {
+    //     payload = { phone_number: user_identity };
+    //   } else {
+    //     res.status(400).json({ message: messagesConstant.en.phoneIsInvalid });
+    //     return;
+    //   }
+    // }
     const tempUser = new TempUserModel({ ...payload, otp: 123 });
     await tempUser.save();
   } else {
@@ -84,7 +90,10 @@ const handleOtp = async (req: Request, res: Response) => {
   }
 
   const foundedTempUser = await TempUserModel.findOne({
-    $or: [{ phone_number: user_identity }, { email: user_identity }],
+    $or: [
+      // { phone_number: user_identity },
+      { email: user_identity },
+    ],
   });
 
   if (!foundedTempUser) {
@@ -120,7 +129,10 @@ const handleSetUserName = async (req: Request, res: Response) => {
   }
 
   const foundedTempUser = await TempUserModel.findOne({
-    $or: [{ phone_number: user_identity }, { email: user_identity }],
+    $or: [
+      // { phone_number: user_identity }      ,
+      { email: user_identity },
+    ],
   });
   if (foundedTempUser) {
     if (!foundedTempUser.successfulOpt) {
@@ -135,7 +147,10 @@ const handleSetUserName = async (req: Request, res: Response) => {
     try {
       await TempUserModel.updateOne(
         {
-          $or: [{ phone_number: user_identity }, { email: user_identity }],
+          $or: [
+            // { phone_number: user_identity },
+            { email: user_identity },
+          ],
         },
         { $set: { username } }
       );
@@ -162,13 +177,17 @@ const handleSetPassword = async (req: Request, res: Response) => {
   }
 
   const foundedTempUser = await TempUserModel.findOne({
-    $or: [{ phone_number: user_identity }, { email: user_identity }],
+    $or: [
+      // { phone_number: user_identity },
+      { email: user_identity },
+    ],
   });
   if (foundedTempUser) {
     const payload = {
       username: foundedTempUser.username,
       email: foundedTempUser.email,
-      phone_number: foundedTempUser.phone_number,
+      // phone_number: foundedTempUser.phone_number,
+      phone_number: null,
       password,
     };
 
