@@ -1,17 +1,14 @@
-import { Request, Response } from "express";
-import FileModel from "../../model/file";
-import UserModel from "../../model/user";
-import PostModel from "../../model/post";
-import CommentModel from "../../model/comment";
-import AddressModel from "../../model/address";
-import ReactionModel from "../../model/reaction";
-import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import messagesConstant from "../../constants/messages";
-import address from "../../model/address";
-import { distanceCalculator } from "../../utils/address";
+import { Request, Response } from "express";
 import mongoose from "mongoose";
-
+import messagesConstant from "../../constants/messages";
+import AddressModel from "../../model/address";
+import CategoryModel from "../../model/category";
+import CommentModel from "../../model/comment";
+import FileModel from "../../model/file";
+import PostModel from "../../model/post";
+import ReactionModel from "../../model/reaction";
+import { getCategoriesFromHuggingFace } from "../../utils/post";
 dotenv.config();
 
 const addNewPostController = async (req: Request, res: Response) => {
@@ -36,13 +33,36 @@ const addNewPostController = async (req: Request, res: Response) => {
       createdFiles = await FileModel.insertMany(editedFiles);
     }
 
+    // const existingCategoryDocs = await CategoryModel.find().select("name");
+    // const existingNames = existingCategoryDocs.map((cat) => cat.name);
+
+    const suggestedCategories = await getCategoriesFromHuggingFace(
+      title + ". " + description
+    );
+
+    console.log(suggestedCategories);
+    // const categories = [];
+    // for (const name of suggestedCategories) {
+    //   let category = await CategoryModel.findOne({ name });
+    //   if (!category) {
+    //     category = await CategoryModel.create({ name });
+    //   }
+    //   categories.push(category);
+    // }
+
     const newPost = await PostModel.insertOne({
       title,
       description,
       medias: createdFiles?.map((item) => item._id) || [],
       address: foundAddress,
       createdBy: main_id,
+      categories: suggestedCategories,
     });
+
+    // const newPostWithCategory = await PostModel.findById(newPost._id).populate(
+    //   "categories"
+    // );
+
     res.status(201).json({
       message: messagesConstant.en.postHasBeenCreated,
       data: { post: newPost },
@@ -376,12 +396,12 @@ const getPostsCommentsController = async (req: Request, res: Response) => {
 };
 
 export {
-  addNewPostController,
-  getPostsController,
-  getMyPostsController,
-  setPostReactionController,
-  deletePostReactionController,
-  getPostDetailsController,
   addNewCommentController,
+  addNewPostController,
+  deletePostReactionController,
+  getMyPostsController,
+  getPostDetailsController,
   getPostsCommentsController,
+  getPostsController,
+  setPostReactionController,
 };

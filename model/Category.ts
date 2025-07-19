@@ -1,8 +1,11 @@
 import mongoose from "mongoose";
 
-const CategorySchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true },
-  slug: { type: String, required: true, unique: true }, // برای URL
-  icon: { type: String }, // اختیاری: emoji یا آدرس آیکن
-  isActive: { type: Boolean, default: true },
-});
+const CategorySchema = new mongoose.Schema(
+  {
+    name: { type: String, unique: true, required: true },
+    icon: { type: String, default: null }, // Optional icon field for future use
+  },
+  { timestamps: true }
+);
+
+export default mongoose.model("Category", CategorySchema);
