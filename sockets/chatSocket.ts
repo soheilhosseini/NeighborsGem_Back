@@ -26,32 +26,31 @@ function chatSocket(io: Server, socket: Socket) {
         createdAt: new Date(),
       });
 
-      const populatedMessage = await MessageModel.findById(
-        savedMessage._id
-      ).populate("createdBy");
-
+      const populatedMessage = await MessageModel.findById(savedMessage._id)
+        .populate("createdBy")
+        .select("-password");
       await MessageDeliveryModel.insertMany(
-        chat.participants.map((participantId) => ({
-          messageId: savedMessage._id,
-          userId: participantId,
-          status: "pending",
-        }))
+        chat.participants
+          .filter(
+            (participantId) => participantId.toString() !== userId.toString()
+          )
+          .map((participantId) => ({
+            messageId: savedMessage._id,
+            userId: participantId,
+            status: "sent",
+            chatId,
+          }))
       );
 
       await ChatModel.updateOne(
         { _id: chatId },
         { lastMessage: savedMessage._id }
       );
-      console.log(chat.participants);
-      // Broadcast to all participants
-      const rooms = io.sockets.adapter.rooms;
-      console.log(rooms);
 
       callback({ status: "ok" });
       chat.participants.forEach(async (participantId) => {
         const sockets = await io.in(`user-${participantId}`).fetchSockets();
         const isUserOnline = sockets.length > 0;
-        console.log(isUserOnline);
         if (isUserOnline) {
           io.to(`user-${participantId}`).emit("message", {
             chatId: chat._id,
@@ -71,17 +70,49 @@ function chatSocket(io: Server, socket: Socket) {
   });
 
   //Confirms message was delivered to client
-  socket.on("message-received", ({ messageId }) => {
-    MessageDeliveryModel.updateOne(
-      { userId: socket.userId, messageId },
-      {
-        $set: { status: "delivered", updatedAt: new Date() },
-      }
-    );
+  socket.on("message_delivered", async ({ messageId }) => {
+    try {
+      const userId = socket.userId;
+      console.log(userId);
+      const messageDelivery = await MessageDeliveryModel.findOneAndUpdate(
+        { userId, messageId },
+        {
+          $set: { status: "delivered", updatedAt: new Date() },
+        },
+        { new: true }
+      );
+      console.log(messageDelivery);
+      const chatId = messageDelivery?.chatId;
+      console.log(chatId);
+
+      let chat = await ChatModel.findOne({
+        _id: chatId,
+      });
+      console.log(chat);
+
+      // Broadcast to all participants except
+      const rooms = io.sockets.adapter.rooms;
+      chat?.participants
+        .filter((participantId) => participantId !== userId)
+        .forEach(async (participantId) => {
+          const sockets = await io.in(`user-${participantId}`).fetchSockets();
+          const isUserOnline = sockets.length > 0;
+          if (isUserOnline) {
+            io.to(`user-${participantId}`).emit("message_delivered", {
+              chatId,
+              messageId,
+            });
+          } else {
+            //push notification
+          }
+        });
+    } catch (err) {
+      console.log(err);
+    }
   });
 
   //Confirms message was read by client
-  socket.on("message-read", ({ messageId }) => {
+  socket.on("message_read", ({ messageId }) => {
     MessageDeliveryModel.updateOne(
       { userId: socket.userId, messageId },
       {

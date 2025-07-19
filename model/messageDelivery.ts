@@ -7,6 +7,11 @@ const MessageDeliverySchema = new mongoose.Schema({
     required: true,
     index: true,
   },
+  chatId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Chat",
+    required: true,
+  },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
@@ -15,8 +20,8 @@ const MessageDeliverySchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["pending", "delivered", "read"],
-    default: "pending",
+    enum: ["sent", "delivered", "read"],
+    default: "sent",
   },
   updatedAt: {
     type: Date,

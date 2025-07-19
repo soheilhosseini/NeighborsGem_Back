@@ -189,7 +189,6 @@ const handleSetPassword = async (req: Request, res: Response) => {
       username: foundedTempUser.username,
       email: foundedTempUser.email,
       // phone_number: foundedTempUser.phone_number,
-      phone_number: null,
       password,
     };
 
