@@ -3,7 +3,6 @@ import { Request, Response } from "express";
 import mongoose from "mongoose";
 import messagesConstant from "../../constants/messages";
 import AddressModel from "../../model/address";
-import CategoryModel from "../../model/category";
 import CommentModel from "../../model/comment";
 import FileModel from "../../model/file";
 import PostModel from "../../model/post";
