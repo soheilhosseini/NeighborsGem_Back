@@ -49,6 +49,19 @@ const getAllMessagesController = async (req: Request, res: Response) => {
 
     console.log("main_id", main_id, typeof main_id);
 
+    // const messages = await MessageModel.find({
+    //   chatId: _id,
+    // })
+    //   .populate({
+    //     path: "createdBy",
+    //     select: "username avatar",
+    //     populate: {
+    //       path: "avatar",
+    //       select: "thumbnail_path",
+    //     },
+    //   })
+    //   .sort({ createdAt: -1 });
+
     const messages = await MessageModel.aggregate([
       { $match: { chatId: new mongoose.Types.ObjectId(_id) } },
 
@@ -57,7 +70,7 @@ const getAllMessagesController = async (req: Request, res: Response) => {
           from: "messagedeliveries",
           let: {
             msgId: "$_id",
-            uid: new mongoose.Types.ObjectId(main_id),
+            uid: main_id,
           },
           pipeline: [
             {
@@ -65,20 +78,19 @@ const getAllMessagesController = async (req: Request, res: Response) => {
                 $expr: {
                   $and: [
                     { $eq: ["$messageId", "$$msgId"] },
-                    { $eq: ["$userId", { $toObjectId: "$$uid" }] },
+                    // { $ne: ["$userId", { $toObjectId: "$$uid" }] },
                   ],
                 },
               },
             },
+            { $project: { status: 1, _id: 0 } },
           ],
           as: "delivery",
         },
       },
       {
         $addFields: {
-          status: {
-            $ifNull: [{ $arrayElemAt: ["$delivery.status", 0] }, "sent"],
-          },
+          status: { $arrayElemAt: ["$delivery.status", 0] },
         },
       },
       { $sort: { createdAt: -1 } },

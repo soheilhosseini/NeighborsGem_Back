@@ -29,18 +29,24 @@ function chatSocket(io: Server, socket: Socket) {
       const populatedMessage = await MessageModel.findById(savedMessage._id)
         .populate("createdBy")
         .select("-password");
-      await MessageDeliveryModel.insertMany(
-        chat.participants
-          .filter(
-            (participantId) => participantId.toString() !== userId.toString()
-          )
-          .map((participantId) => ({
-            messageId: savedMessage._id,
-            userId: participantId,
-            status: "sent",
-            chatId,
-          }))
-      );
+      // await MessageDeliveryModel.insertMany(
+      //   chat.participants
+      //     .filter(
+      //       (participantId) => participantId.toString() !== userId.toString()
+      //     )
+      //     .map((participantId) => ({
+      //       messageId: savedMessage._id,
+      //       userId: participantId,
+      //       status: "sent",
+      //       chatId,
+      //     }))
+      // );
+      await MessageDeliveryModel.insertOne({
+        messageId: savedMessage._id,
+        userId,
+        status: "sent",
+        chatId,
+      });
 
       await ChatModel.updateOne(
         { _id: chatId },
@@ -54,7 +60,7 @@ function chatSocket(io: Server, socket: Socket) {
         if (isUserOnline) {
           io.to(`user-${participantId}`).emit("message", {
             chatId: chat._id,
-            message: populatedMessage,
+            message: { ...populatedMessage?.toObject(), status: "sent" },
           });
           await MessageModel.findByIdAndUpdate(savedMessage._id, {
             $addToSet: { deliveredTo: participantId },
@@ -70,28 +76,31 @@ function chatSocket(io: Server, socket: Socket) {
   });
 
   //Confirms message was delivered to client
-  socket.on("message_delivered", async ({ messageId }) => {
+  socket.on("message_delivered", async ({ messageId }, callback) => {
     try {
       const userId = socket.userId;
-      console.log(userId);
+
       const messageDelivery = await MessageDeliveryModel.findOneAndUpdate(
-        { userId, messageId },
+        { messageId },
         {
           $set: { status: "delivered", updatedAt: new Date() },
         },
         { new: true }
       );
-      console.log(messageDelivery);
+
       const chatId = messageDelivery?.chatId;
-      console.log(chatId);
 
       let chat = await ChatModel.findOne({
         _id: chatId,
       });
-      console.log(chat);
+
+      if (!chat?.participants.includes(userId)) {
+        callback({ status: "failed" });
+        return;
+      }
+      console.log("chat", chat);
 
       // Broadcast to all participants except
-      const rooms = io.sockets.adapter.rooms;
       chat?.participants
         .filter((participantId) => participantId !== userId)
         .forEach(async (participantId) => {
@@ -112,21 +121,56 @@ function chatSocket(io: Server, socket: Socket) {
   });
 
   //Confirms message was read by client
-  socket.on("message_read", ({ messageId }) => {
-    MessageDeliveryModel.updateOne(
-      { userId: socket.userId, messageId },
+  socket.on("message_read", async ({ messageId }, callback) => {
+    const userId = socket.userId;
+    const messageDelivery = await MessageDeliveryModel.findOneAndUpdate(
+      { messageId },
+      {
+        $set: { status: "delivered", updatedAt: new Date() },
+      },
+      { new: true }
+    );
+
+    const chatId = messageDelivery?.chatId;
+
+    let chat = await ChatModel.findOne({
+      _id: chatId,
+    });
+
+    if (!chat?.participants.includes(userId)) {
+      callback({ status: "failed" });
+      return;
+    }
+    await MessageDeliveryModel.updateOne(
+      { messageId },
       {
         $set: { status: "read", updatedAt: new Date() },
       }
     );
+
+    chat?.participants
+      .filter((participantId) => participantId !== userId)
+      .forEach(async (participantId) => {
+        const sockets = await io.in(`user-${participantId}`).fetchSockets();
+        const isUserOnline = sockets.length > 0;
+        if (isUserOnline) {
+          io.to(`user-${participantId}`).emit("message_read", {
+            chatId,
+            messageId,
+          });
+        } else {
+          //push notification
+        }
+      });
   });
 }
 
 const sendUndeliveredMessages = async (socket: Socket) => {
   const userId = socket.userId;
   const undelivered = await MessageDeliveryModel.find({
-    userId,
-    status: { $in: ["pending", "delivered"] },
+    //FIX ME
+    userId: { $ne: userId },
+    status: { $in: ["sent", "delivered"] },
   }).populate("messageId");
 
   for (const delivery of undelivered) {
