@@ -29,24 +29,14 @@ function chatSocket(io: Server, socket: Socket) {
       const populatedMessage = await MessageModel.findById(savedMessage._id)
         .populate("createdBy")
         .select("-password");
-      // await MessageDeliveryModel.insertMany(
-      //   chat.participants
-      //     .filter(
-      //       (participantId) => participantId.toString() !== userId.toString()
-      //     )
-      //     .map((participantId) => ({
-      //       messageId: savedMessage._id,
-      //       userId: participantId,
-      //       status: "sent",
-      //       chatId,
-      //     }))
-      // );
-      await MessageDeliveryModel.insertOne({
-        messageId: savedMessage._id,
-        userId,
-        status: "sent",
-        chatId,
-      });
+      await MessageDeliveryModel.insertMany(
+        chat.participants.map((participantId) => ({
+          messageId: savedMessage._id,
+          userId: participantId,
+          status: "sent",
+          chatId,
+        }))
+      );
 
       await ChatModel.updateOne(
         { _id: chatId },
@@ -70,13 +60,14 @@ function chatSocket(io: Server, socket: Socket) {
         }
       });
     } catch (err) {
+      callback({ status: "error" });
       console.error(err);
       socket.emit("error", { msg: "Server error" });
     }
   });
 
   //Confirms message was delivered to client
-  socket.on("message_delivered", async ({ messageId }, callback) => {
+  socket.on("message_delivered", async ({ messageId }) => {
     try {
       const userId = socket.userId;
 
@@ -95,10 +86,8 @@ function chatSocket(io: Server, socket: Socket) {
       });
 
       if (!chat?.participants.includes(userId)) {
-        callback({ status: "failed" });
         return;
       }
-      console.log("chat", chat);
 
       // Broadcast to all participants except
       chat?.participants
@@ -121,7 +110,7 @@ function chatSocket(io: Server, socket: Socket) {
   });
 
   //Confirms message was read by client
-  socket.on("message_read", async ({ messageId }, callback) => {
+  socket.on("message_read", async ({ messageId }) => {
     const userId = socket.userId;
     const messageDelivery = await MessageDeliveryModel.findOneAndUpdate(
       { messageId },
@@ -138,7 +127,6 @@ function chatSocket(io: Server, socket: Socket) {
     });
 
     if (!chat?.participants.includes(userId)) {
-      callback({ status: "failed" });
       return;
     }
     await MessageDeliveryModel.updateOne(
@@ -167,29 +155,64 @@ function chatSocket(io: Server, socket: Socket) {
 
 const sendUndeliveredMessages = async (socket: Socket) => {
   const userId = socket.userId;
-  const undelivered = await MessageDeliveryModel.find({
-    //FIX ME
-    userId: { $ne: userId },
-    status: { $in: ["sent", "delivered"] },
-  }).populate("messageId");
 
-  for (const delivery of undelivered) {
-    const msg = delivery.messageId as any;
-
-    socket.emit("message", {
-      chatId: msg.chatId,
-      message: {
-        _id: msg._id,
-        content: msg.content,
-        sender: msg.sender,
-        createdAt: msg.createdAt,
+  const messages = await MessageDeliveryModel.aggregate([
+    {
+      $match: {
+        userId: new mongoose.Types.ObjectId(userId),
+        status: "sent",
       },
-    });
+    },
+    // {
+    //   $lookup: {
+    //     from: "messages",
+    //     localField: "messageId",
+    //     foreignField: "_id",
+    //     as: "message",
+    //   },
+    // },
+    // { $unwind: "$message" },
 
-    await MessageDeliveryModel.updateOne(
-      { _id: delivery._id },
-      { $set: { status: "delivered", updatedAt: new Date() } }
-    );
+    // // Lookup createdBy (User)
+    // {
+    //   $lookup: {
+    //     from: "users",
+    //     localField: "message.createdBy",
+    //     foreignField: "_id",
+    //     as: "message.createdBy",
+    //   },
+    // },
+    // { $unwind: "$message.createdBy" },
+
+    // // Lookup avatar inside createdBy
+    // {
+    //   $lookup: {
+    //     from: "files",
+    //     localField: "message.createdBy.avatar",
+    //     foreignField: "_id",
+    //     as: "message.createdBy.avatar",
+    //   },
+    // },
+    // {
+    //   $unwind: {
+    //     path: "$message.createdBy.avatar",
+    //     preserveNullAndEmptyArrays: true, // allow null avatar
+    //   },
+    // },
+
+    // // Return only the message
+    // {
+    //   $replaceRoot: { newRoot: "$message" },
+    // },
+  ]);
+  console.log(messages);
+  for (const delivery of messages) {
+    console.log(delivery);
+
+    // socket.emit("message", {
+    //   chatId: msg.chatId,
+    //   message: msg,
+    // });
   }
 };
 

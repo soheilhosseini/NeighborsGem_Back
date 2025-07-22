@@ -1,4 +1,4 @@
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 import https from "https";
 import http from "http";
 import { chatSocket, sendUndeliveredMessages } from "./sockets/chatSocket";
@@ -15,6 +15,7 @@ declare module "socket.io" {
   }
 }
 
+let io: Server;
 const socketInitializer = (app: Express) => {
   const options = process.env.HTTPS
     ? {
@@ -27,7 +28,7 @@ const socketInitializer = (app: Express) => {
     ? https.createServer(options, app)
     : http.createServer(app);
 
-  const io = new Server(server, {
+  io = new Server(server, {
     cors: {
       origin: process.env.HTTPS
         ? "https://localhost:3000"
@@ -38,6 +39,7 @@ const socketInitializer = (app: Express) => {
   });
 
   io.use((socket, next) => {
+    socket = socket;
     const rawCookie = socket.handshake.headers.cookie || "";
     const parsed = cookie.parse(rawCookie);
     const access_token = parsed["access_token"] || "";
@@ -81,5 +83,7 @@ const socketInitializer = (app: Express) => {
 
   return server;
 };
+
+export const getIo = () => io;
 
 export default socketInitializer;

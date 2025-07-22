@@ -3,6 +3,8 @@ import { Request, Response } from "express";
 import ChatModel from "../../model/chat";
 import MessageModel from "../../model/message";
 import mongoose from "mongoose";
+import { getIo } from "../../socket";
+import { SocketType } from "../../constants";
 
 dotenv.config();
 
@@ -157,6 +159,18 @@ const getPostsChatIdController = async (req: Request, res: Response) => {
         isGroup: false,
         participants: [main_id, receiverId],
       });
+      const populatedChat = await ChatModel.findOne({ _id: chat._id })
+        .select("-password")
+        .populate({
+          path: "participants",
+          select: "username _id avatar first_name last_name email",
+          populate: {
+            path: "avatar",
+            select: "thumbnail_path",
+          },
+        });
+      const io = getIo();
+      io.emit(SocketType.NEW_CHAT, { data: populatedChat });
     }
     res.json({ chatId: chat._id });
   } catch (err) {
