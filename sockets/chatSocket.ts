@@ -61,7 +61,6 @@ function chatSocket(io: Server, socket: Socket) {
           });
         } else {
           const user = await UserModel.findOne({ _id: participantId });
-          console.log(user);
           if (user && user.pushToken) {
             const message = {
               token: user.pushToken,
