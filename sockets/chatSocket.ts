@@ -78,7 +78,7 @@ function chatSocket(io: Server, socket: Socket) {
                   click_action:
                     process.env.NODE_ENV === "development"
                       ? `https://192.168.1.6:3000/chats/${chatId}`
-                      : "https://nesgem.com/chats/${chatId}",
+                      : `https://nesgem.com/chats/${chatId}`,
                 },
               },
             };
