@@ -34,10 +34,10 @@ const addNewPostController = async (req: Request, res: Response) => {
 
     // const existingCategoryDocs = await CategoryModel.find().select("name");
     // const existingNames = existingCategoryDocs.map((cat) => cat.name);
-
-    const suggestedCategories = await getCategoriesFromHuggingFace(
+    let suggestedCategories = [];
+    suggestedCategories = await getCategoriesFromHuggingFace(
       title + ". " + description
-    );
+    ).catch((err) => console.log(err));
 
     console.log(suggestedCategories);
     // const categories = [];
