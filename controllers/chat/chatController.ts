@@ -160,7 +160,6 @@ const getPostsChatIdController = async (req: Request, res: Response) => {
         participants: [main_id, receiverId],
       });
       const populatedChat = await ChatModel.findOne({ _id: chat._id })
-        .select("-password")
         .populate({
           path: "participants",
           select: "username _id avatar first_name last_name email",

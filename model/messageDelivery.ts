@@ -12,7 +12,13 @@ const MessageDeliverySchema = new mongoose.Schema({
     ref: "Chat",
     required: true,
   },
-  userId: {
+  senderId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+    index: true,
+  },
+  receiverId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,

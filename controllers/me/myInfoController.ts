@@ -31,7 +31,6 @@ const getMyInfoController = async (req: Request, res: Response) => {
         const user = await UserModel.findOne({
           _id: decoded._id,
         })
-          .select("-password")
           .populate("avatar");
         res.json({ message: "", data: { user } });
       }
