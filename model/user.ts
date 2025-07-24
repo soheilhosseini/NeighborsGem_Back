@@ -8,10 +8,11 @@ const UserSchema = new mongoose.Schema(
     email: { type: String, trim: true, sparse: true, unique: true },
     phone_number: { type: String, trim: true, sparse: true, unique: true },
     username: { type: String, trim: true, sparse: true, unique: true },
-    password: { type: String, trim: true },
+    password: { type: String, trim: true, select: false },
     avatar: { type: mongoose.Schema.Types.ObjectId, ref: "File" },
+    pushToken: { type: String },
   },
-  { timestamps: true }
+  { timestamps: true}
 );
 
 UserSchema.pre("save", async function (next) {

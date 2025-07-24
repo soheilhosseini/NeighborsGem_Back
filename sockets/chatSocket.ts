@@ -153,7 +153,12 @@ const sendUndeliveredMessages = async (socket: Socket) => {
     {
       $match: {
         receiverId: new mongoose.Types.ObjectId(userId),
-        status: "sent",
+        $or: [
+          {
+            status: "sent",
+          },
+          { status: "delivered" },
+        ],
       },
     },
     {
@@ -200,7 +205,7 @@ const sendUndeliveredMessages = async (socket: Socket) => {
   ]);
 
   for (const delivery of messages) {
-    socket.emit("message", {
+    socket.emit("unread_messages", {
       chatId: delivery.chatId,
       message: delivery,
     });
