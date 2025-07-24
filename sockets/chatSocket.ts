@@ -1,8 +1,11 @@
 import type { Server, Socket } from "socket.io";
 import ChatModel from "../model/chat";
 import MessageModel from "../model/message";
+import UserModel from "../model/user";
 import MessageDeliveryModel from "../model/messageDelivery";
 import mongoose from "mongoose";
+import "../firebase/firebase";
+import admin from "firebase-admin";
 
 function chatSocket(io: Server, socket: Socket) {
   // Client Sent a message
@@ -57,7 +60,35 @@ function chatSocket(io: Server, socket: Socket) {
             message: { ...populatedMessage?.toObject(), status: "sent" },
           });
         } else {
-          //push notification
+          const user = await UserModel.findOne({ _id: participantId });
+          console.log(user);
+          if (user && user.pushToken) {
+            const message = {
+              token: user.pushToken,
+              notification: {
+                title: `New message from ${
+                  user.username ||
+                  (user.first_name && user.first_name + " " + user.last_name) ||
+                  user.email ||
+                  user.phone_number
+                }`,
+                body: content,
+              },
+              webpush: {
+                notification: {
+                  click_action:
+                    process.env.NODE_ENV === "development"
+                      ? `https://localhost:3000/chats/${chatId}`
+                      : "https://nesgem/chats/${chatId}",
+                },
+              },
+            };
+            admin
+              .messaging()
+              .send(message)
+              .then((response) => console.log("Sent:", response))
+              .catch((err) => console.error("Error:", err));
+          }
         }
       });
     } catch (err) {
