@@ -74,7 +74,7 @@ function chatSocket(io: Server, socket: Socket) {
             const message = {
               token: user.pushToken,
               notification: {
-                title: 'Nesgem',
+                title: "Nesgem",
                 body: `You have a new message`,
               },
               webpush: {
@@ -83,8 +83,8 @@ function chatSocket(io: Server, socket: Socket) {
                   renotify: true,
                   click_action:
                     process.env.NODE_ENV === "development"
-                      ? `https://192.168.1.6:3000/chats/${chatId}`
-                      : `https://nesgem.com/chats/${chatId}`,
+                      ? `https://192.168.1.6:3000/chats`
+                      : `https://nesgem.com/chats`,
                 },
               },
             };
