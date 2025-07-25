@@ -2,10 +2,12 @@ import type { Server, Socket } from "socket.io";
 import ChatModel from "../model/chat";
 import MessageModel from "../model/message";
 import UserModel from "../model/user";
+import NotificationModel from "../model/notification";
 import MessageDeliveryModel from "../model/messageDelivery";
 import mongoose from "mongoose";
 import "../firebase/firebase";
 import admin from "firebase-admin";
+import { NotificationTypes } from "../types/notifications";
 
 function chatSocket(io: Server, socket: Socket) {
   // Client Sent a message
@@ -60,6 +62,13 @@ function chatSocket(io: Server, socket: Socket) {
             message: { ...populatedMessage?.toObject(), status: "sent" },
           });
         } else {
+          const messageNotification = await NotificationModel.findOne({
+            type: NotificationTypes.newMessage,
+            recieverId: participantId,
+          });
+          if (messageNotification) {
+            return;
+          }
           const user = await UserModel.findOne({ _id: participantId });
           if (user && user.pushToken) {
             const message = {
@@ -72,6 +81,8 @@ function chatSocket(io: Server, socket: Socket) {
                   user.phone_number
                 }`,
                 body: content,
+                tag: "Nesgem",
+                renotify: true,
               },
               webpush: {
                 notification: {
@@ -87,6 +98,11 @@ function chatSocket(io: Server, socket: Socket) {
               .send(message)
               .then((response) => console.log("Sent:", response))
               .catch((err) => console.error("Error:", err));
+
+            await NotificationModel.create({
+              type: NotificationTypes.newMessage,
+              recieverId: participantId,
+            });
           }
         }
       });
@@ -238,6 +254,10 @@ const sendUndeliveredMessages = async (socket: Socket) => {
     socket.emit("unread_messages", {
       chatId: delivery.chatId,
       message: delivery,
+    });
+    await NotificationModel.deleteOne({
+      type: NotificationTypes.newMessage,
+      recieverId: userId,
     });
   }
 };
