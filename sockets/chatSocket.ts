@@ -66,26 +66,21 @@ function chatSocket(io: Server, socket: Socket) {
             type: NotificationTypes.newMessage,
             recieverId: participantId,
           });
-          if (messageNotification) {
-            return;
-          }
+          // if (messageNotification) {
+          //   return;
+          // }
           const user = await UserModel.findOne({ _id: participantId });
           if (user && user.pushToken) {
             const message = {
               token: user.pushToken,
               notification: {
-                title: `New message from ${
-                  user.username ||
-                  (user.first_name && user.first_name + " " + user.last_name) ||
-                  user.email ||
-                  user.phone_number
-                }`,
-                body: content,
-                tag: "Nesgem",
-                renotify: true,
+                title: 'Nesgem',
+                body: `You have a new message`,
               },
               webpush: {
                 notification: {
+                  tag: "Nesgem",
+                  renotify: true,
                   click_action:
                     process.env.NODE_ENV === "development"
                       ? `https://192.168.1.6:3000/chats/${chatId}`
