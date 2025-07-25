@@ -66,9 +66,9 @@ function chatSocket(io: Server, socket: Socket) {
             type: NotificationTypes.newMessage,
             recieverId: participantId,
           });
-          // if (messageNotification) {
-          //   return;
-          // }
+          if (messageNotification) {
+            return;
+          }
           const user = await UserModel.findOne({ _id: participantId });
           if (user && user.pushToken) {
             const message = {
@@ -250,7 +250,7 @@ const sendUndeliveredMessages = async (socket: Socket) => {
       chatId: delivery.chatId,
       message: delivery,
     });
-    await NotificationModel.deleteOne({
+    await NotificationModel.deleteMany({
       type: NotificationTypes.newMessage,
       recieverId: userId,
     });
