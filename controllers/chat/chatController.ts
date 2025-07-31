@@ -120,18 +120,80 @@ const getAllMessagesController = async (req: Request, res: Response) => {
         },
       },
       {
+        $lookup: {
+          from: "posts",
+          let: { pid: "$postId" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ["$_id", "$$pid"],
+                },
+              },
+            },
+          ],
+          as: "post",
+        },
+      },
+      {
+        $unwind: {
+          path: "$post",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "files",
+          let: {
+            mediaIds: { $ifNull: ["$post.medias", []] },
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $in: ["$_id", "$$mediaIds"],
+                },
+              },
+            },
+            {
+              $project: {
+                _id: 1,
+                file_path: 1,
+              },
+            },
+          ],
+          as: "post.medias",
+        },
+      },
+      {
+        $addFields: {
+          "post.medias": { $slice: ["$post.medias", 1] },
+        },
+      },
+
+      {
         $project: {
           content: 1,
           createdAt: 1,
           chatId: 1,
           replyTo: 1,
           filesId: 1,
-          postId: 1,
           status: 1,
           createdBy: {
             username: 1,
             avatar: { thumbnail_path: 1 },
             _id: 1,
+          },
+          post: {
+            $cond: {
+              if: { $gt: ["$postId", null] }, // only if postId exists
+              then: {
+                title: "$post.title",
+                description: "$post.description",
+                medias: "$post.medias",
+              },
+              else: "$$REMOVE", // <-- remove 'post' field entirely
+            },
           },
         },
       },
@@ -147,7 +209,7 @@ const getAllMessagesController = async (req: Request, res: Response) => {
 
 const getPostsChatIdController = async (req: Request, res: Response) => {
   const { main_id } = req.auth;
-  const { receiverId } = req.query;
+  const { receiverId, postId } = req.query;
   try {
     let chat = await ChatModel.findOne({
       participants: { $all: [main_id, receiverId], $size: 2 },
@@ -159,18 +221,24 @@ const getPostsChatIdController = async (req: Request, res: Response) => {
         isGroup: false,
         participants: [main_id, receiverId],
       });
-      const populatedChat = await ChatModel.findOne({ _id: chat._id })
-        .populate({
+      const populatedChat = await ChatModel.findOne({ _id: chat._id }).populate(
+        {
           path: "participants",
           select: "username _id avatar first_name last_name email",
           populate: {
             path: "avatar",
             select: "thumbnail_path",
           },
-        });
+        }
+      );
       const io = getIo();
       io.emit(SocketType.NEW_CHAT, { data: populatedChat });
     }
+    await MessageModel.create({
+      postId,
+      chatId: chat._id,
+      createdBy: main_id,
+    });
     res.json({ chatId: chat._id });
   } catch (err) {
     console.log(err);

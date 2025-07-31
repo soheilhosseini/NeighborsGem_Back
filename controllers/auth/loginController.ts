@@ -1,22 +1,18 @@
-import fs from "fs/promises";
-import { Request, Response } from "express";
-import messagesConstant from "../../constants/messages";
 import bcrypt from "bcrypt";
-import path from "path";
-import UserModel from "../../model/user";
-import FileModel from "../../model/file";
-import TempUserModel from "../../model/tempUser";
-import {
-  emailValidator,
-  isValidPassword,
-  phoneNumberValidator,
-} from "../../utils/validation";
 import dotenv from "dotenv";
-import { addAccessTokenToCookie, generateAccessToken } from "../../utils/auth";
-import jwt from "jsonwebtoken";
-import { sameSite } from "../../utils/generals";
-import { Readable } from "stream";
+import { Request, Response } from "express";
+import fs from "fs/promises";
 import { OAuth2Client } from "google-auth-library";
+import path from "path";
+import messagesConstant from "../../constants/messages";
+import FileModel from "../../model/file";
+import UserModel from "../../model/user";
+import {
+  addAccessTokenToCookie,
+  generateAccessToken,
+  handleEmail,
+} from "../../utils/auth";
+import { sameSite } from "../../utils/generals";
 dotenv.config();
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -30,36 +26,36 @@ const loginWithPasswordController = async (req: Request, res: Response) => {
     return;
   }
 
-  const foundedUser = await UserModel.findOne({
-    $or: [
-      // { phone_number: user_identity },
-      { email: user_identity },
-      { username: user_identity },
-    ],
-  });
+  try {
+    const foundedUser = await UserModel.findOne({
+      $or: [
+        // { phone_number: user_identity },
+        { email: { $regex: `^${user_identity}$`, $options: "i" } },
+        { username: { $regex: `^${user_identity}$`, $options: "i" } },
+      ],
+    });
 
-  if (!foundedUser) {
-    res
-      .status(409)
-      .json({ message: messagesConstant.en.userOrPasswordIsWrong });
-    return;
-  }
+    if (!foundedUser) {
+      res
+        .status(409)
+        .json({ message: messagesConstant.en.userOrPasswordIsWrong });
+      return;
+    }
 
-  const isPasswordValid = await bcrypt.compare(
-    password,
-    foundedUser.password as string
-  );
-  if (isPasswordValid) {
-    try {
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      foundedUser.password as string
+    );
+    if (isPasswordValid) {
       addAccessTokenToCookie(
         res,
         generateAccessToken(foundedUser._id.toString())
       );
       res.sendStatus(200);
-    } catch {
-      res.sendStatus(400);
+    } else {
+      throw Error();
     }
-  } else {
+  } catch {
     res
       .status(400)
       .json({ message: messagesConstant.en.loginWithPasswordWrongInputs });
@@ -76,20 +72,35 @@ const loginWithOTPGetUserIdentityController = async (
     return;
   }
 
-  const foundedUser = await UserModel.findOne({
-    $or: [
-      // { phone_number: user_identity },
-      { email: user_identity },
-      { username: user_identity },
-    ],
-  });
+  try {
+    const foundedUser = await UserModel.findOne({
+      $or: [
+        // { phone_number: user_identity },
+        { email: { $regex: `^${user_identity}$`, $options: "i" } },
+        { username: { $regex: `^${user_identity}$`, $options: "i" } },
+      ],
+    });
 
-  // if (!foundedUser) {
-  //   res.status(404).json({ message: messagesConstant.en.loginUserNotFound });
-  //   return;
-  // }
+    if (!foundedUser) {
+      res.status(404).json({ message: messagesConstant.en.loginUserNotFound });
+      return;
+    }
 
-  res.json({ message: messagesConstant.en.optSent });
+    // if (process.env.NODE_ENV === "production") {
+    // if (foundedUser.email) {
+    // const code = Math.random().toString().slice(0, 4);
+    // await handleEmail({ destinationEmail: foundedUser.email, code })
+    //   .then(() => res.json({ message: messagesConstant.en.optSent }))
+    //   .catch((err) => console.log("err", err));
+    // return;
+    // }
+    // } else {
+    //   res.json({ message: messagesConstant.en.optSent });
+    // }
+    res.json({ message: messagesConstant.en.optSent });
+  } catch {
+    res.sendStatus(500);
+  }
 };
 
 const loginWithOTPCheckOTPController = async (req: Request, res: Response) => {
@@ -104,8 +115,8 @@ const loginWithOTPCheckOTPController = async (req: Request, res: Response) => {
   const foundedUser = await UserModel.findOne({
     $or: [
       // { phone_number: user_identity },
-      { email: user_identity },
-      { username: user_identity },
+      { email: { $regex: `^${user_identity}$`, $options: "i" } },
+      { username: { $regex: `^${user_identity}$`, $options: "i" } },
     ],
   });
 
@@ -151,9 +162,8 @@ const loginWithGoogleController = async (req: Request, res: Response) => {
   } catch (err) {
     console.log(err);
     res.sendStatus(400);
-    return
+    return;
   }
-
 
   const userInfo = googleUserInfo;
 
@@ -260,10 +270,10 @@ const logoutController = (req: Request, res: Response) => {
 };
 
 export {
-  loginWithPasswordController,
-  loginWithOTPGetUserIdentityController,
-  loginWithOTPCheckOTPController,
   loginWithGoogleController,
-  recaptchaController,
+  loginWithOTPCheckOTPController,
+  loginWithOTPGetUserIdentityController,
+  loginWithPasswordController,
   logoutController,
+  recaptchaController,
 };
