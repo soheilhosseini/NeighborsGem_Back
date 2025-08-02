@@ -1,0 +1,30 @@
+module.exports = {
+  preset: "ts-jest",
+  testEnvironment: "node",
+  roots: ["<rootDir>/src", "<rootDir>/tests"],
+  testMatch: ["**/__tests__/**/*.ts", "**/?(*.)+(spec|test).ts"],
+  transform: {
+    "^.+\\.ts$": "ts-jest",
+  },
+  collectCoverageFrom: [
+    "src/**/*.ts",
+    "!src/**/*.d.ts",
+    "!src/**/*.test.ts",
+    "!src/**/*.spec.ts",
+  ],
+  coverageDirectory: "coverage",
+  coverageReporters: ["text", "lcov", "html"],
+  setupFilesAfterEnv: ["<rootDir>/tests/setup.ts"],
+  moduleNameMapping: {
+    "^@/(.*)$": "<rootDir>/$1",
+    "^@config/(.*)$": "<rootDir>/config/$1",
+    "^@controllers/(.*)$": "<rootDir>/controllers/$1",
+    "^@middleware/(.*)$": "<rootDir>/middleware/$1",
+    "^@models/(.*)$": "<rootDir>/model/$1",
+    "^@routes/(.*)$": "<rootDir>/routes/$1",
+    "^@utils/(.*)$": "<rootDir>/utils/$1",
+    "^@types/(.*)$": "<rootDir>/types/$1",
+  },
+  testTimeout: 10000,
+  verbose: true,
+};
